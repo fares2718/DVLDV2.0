@@ -1,0 +1,57 @@
+## ==========================================
+## JetBrains Shared (Rider & DataGrip)
+## ==========================================
+.idea/
+# If you want to share Rider project configurations (like run configurations),
+# uncomment the line above and use the granular rules below instead:
+# .idea/**/workspace.xml
+# .idea/**/tasks.xml
+# .idea/**/usage.statistics.xml
+# .idea/**/dictionaries
+# .idea/**/shelf
+# .idea/**/contentModel.xml
+
+## --- Rider Specific ---
+*.sln.iml
+.idea/.idea.*/
+
+## --- DataGrip Specific ---
+# Exclude database connection credentials and local console histories
+.idea/**/dataSources/
+.idea/**/dataSources.ids
+.idea/**/dataSources.local.xml
+.idea/**/sqlDataSources.xml
+.idea/**/dbnavigator.xml
+
+## ==========================================
+## Visual Studio Code (VS Code)
+## ==========================================
+.vscode/
+# Uncomment the lines below if you want to store shared launch configurations,
+# but ignore user-specific workspace preferences:
+# !.vscode/extensions.json
+# !.vscode/launch.json
+# !.vscode/tasks.json
+# .vscode/*
+# !.vscode/settings.json
+
+# VS Code crash dumps and history
+.history/
+*.code-workspace
+
+## ==========================================
+## .NET / Build Artifacts
+## ==========================================
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Bb]in/
+[Oo]bj/
+x64/
+x86/
+
+# User-specific configuration files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
