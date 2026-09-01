@@ -26,24 +26,140 @@ We need a **privilege inclusion** (hierarchical or set-based) model.
 
 We introduce the concept of **Privilege Level** or **Included Classes**.
 
-### Option A – Simple Numeric Hierarchy (Recommended for first version)
+### 3.1 LicenseClass — Bitwise Privilege Hierarchy
 
-Assign each class a `PrivilegeLevel` (integer).  
-A driver is allowed to drive any class whose PrivilegeLevel ≤ the highest level he holds.
+`LicenseClass` represents the different local driving license categories.
 
-| Class | Name                    | Suggested PrivilegeLevel | Min Age | Default Validity | Notes            |
-| ----- | ----------------------- | ------------------------ | ------- | ---------------- | ---------------- |
-| 1     | Small Motorcycle        | 1                        | 18      | 5 years          | Base motorcycle  |
-| 2     | Heavy Motorcycle        | 2                        | 21      | 5 years          | Includes Class 1 |
-| 3     | Ordinary Car (Private)  | 10                       | 18      | 10 years         | Base car         |
-| 4     | Taxi / Limousine        | 20                       | 21      | 10 years         | Includes Class 3 |
-| 5     | Agricultural            | 15                       | 21      | 10 years         | Independent      |
-| 6     | Small/Medium Bus        | 30                       | 21      | 10 years         | Includes 3 + 4   |
-| 7     | Heavy Truck / Large Bus | 40                       | 21      | 10 years         | Highest          |
+The system uses a bitwise privilege model. Each basic driving privilege is represented by one unique bit.
 
-**Advantages**: Very simple to implement and query.  
-**Disadvantages**: Not flexible enough if the inclusion is not strictly linear (e.g. Agricultural may not include Taxi).
+`PrivilegeLevel` stores the **complete privilege mask** granted by the license, including all lower privileges inherited through the hierarchy.
 
+### Privilege Bits
+
+| Privilege               |  Bit |
+| ----------------------- | ---: |
+| Small Motorcycle        |  `1` |
+| Heavy Motorcycle        |  `2` |
+| Ordinary Car            |  `4` |
+| Taxi / Limousine        |  `8` |
+| Agricultural            | `16` |
+| Small / Medium Bus      | `32` |
+| Heavy Truck / Large Bus | `64` |
+
+These values are powers of two so that individual privileges can be tested using SQL Server's bitwise `&` operator.
+
+### License Hierarchy
+
+The hierarchy represents which higher license grants the privileges of a lower license.
+
+```text
+Heavy Motorcycle
+        │
+        ▼
+Small Motorcycle
+```
+
+```text
+Heavy Truck / Large Bus
+        │
+        ▼
+Small / Medium Bus
+        │
+        ▼
+Taxi / Limousine
+        │
+        ▼
+Ordinary Car
+```
+
+```text
+Agricultural
+    │
+    └── Independent
+```
+
+`ParentClassID` points from the lower license to the superior license.
+
+For example:
+
+```text
+Small Motorcycle.ParentClassID = Heavy Motorcycle
+Ordinary Car.ParentClassID     = Taxi
+Taxi.ParentClassID             = Small / Medium Bus
+Small / Medium Bus.ParentClassID = Heavy Truck
+```
+
+### Complete Privilege Masks
+
+Because `PrivilegeLevel` stores all privileges granted by the license:
+
+| License Class           | Own Bit | Complete Privilege Mask |
+| ----------------------- | ------: | ----------------------: |
+| Small Motorcycle        |     `1` |                     `1` |
+| Heavy Motorcycle        |     `2` |                     `3` |
+| Ordinary Car            |     `4` |                     `4` |
+| Taxi / Limousine        |     `8` |                    `12` |
+| Agricultural            |    `16` |                    `16` |
+| Small / Medium Bus      |    `32` |                    `44` |
+| Heavy Truck / Large Bus |    `64` |                   `108` |
+
+The masks are calculated as:
+
+```text
+Heavy Motorcycle
+2 + 1 = 3
+
+Taxi / Limousine
+8 + 4 = 12
+
+Small / Medium Bus
+32 + 8 + 4 = 44
+
+Heavy Truck / Large Bus
+64 + 32 + 8 + 4 = 108
+```
+
+### Privilege Checking
+
+A driver's effective privilege mask can be checked against a required privilege using the bitwise `&` operator.
+
+```sql
+(DriverPrivilegeMask & RequiredPrivilege) = RequiredPrivilege
+```
+
+For example, a driver with:
+
+```text
+DriverPrivilegeMask = 108
+```
+
+can drive:
+
+```text
+108 & 64 = 64   → Heavy Truck / Large Bus
+108 & 32 = 32   → Small / Medium Bus
+108 & 8  = 8    → Taxi / Limousine
+108 & 4  = 4    → Ordinary Car
+108 & 16 = 0    → Agricultural
+```
+
+Therefore, the driver has all privileges in the Heavy Truck hierarchy but does not have the Agricultural privilege.
+
+### Design Rules
+
+1. Each basic privilege must have a unique power-of-two bit.
+    
+2. `PrivilegeLevel` stores the complete privilege mask, not a numerical rank.
+    
+3. `ParentClassID` points to the superior license.
+    
+4. A higher license contains the privileges of all lower licenses in its hierarchy.
+    
+5. Privileges are checked using the SQL Server `&` operator.
+    
+6. Agricultural and motorcycle privileges remain independent from the car/bus hierarchy.
+    
+7. `PrivilegeLevel` uses `TINYINT` because the current system requires only seven bits.
 ## 4. Business Rules for Hierarchical Classes
 
 1. When issuing a **new** license of class X:
