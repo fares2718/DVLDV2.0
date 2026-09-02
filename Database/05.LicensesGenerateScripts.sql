@@ -22,7 +22,9 @@ CREATE TABLE dbo.LicenseClasses
         CONSTRAINT DF_LicenseClasses_ClassFees
             DEFAULT 0,
 
-    PrivilegeBIT         TINYINT NOT NULL,
+    PrivilegeLevel TINYINT NOT NULL,
+
+    PrivilegeBit         TINYINT NOT NULL,
 
     ParentClassID           INT NULL,
 

@@ -33,6 +33,7 @@ INSERT INTO dbo.LicenseClasses
     DefaultValidityYears,
     ClassFees,
     PrivilegeLevel,
+    PrivilegeBit,
     ParentClassID
 )
 VALUES
@@ -44,6 +45,7 @@ VALUES
         5,
         75.00,
         3,
+        2,
         NULL
     );
 GO
@@ -64,6 +66,7 @@ INSERT INTO dbo.LicenseClasses
     DefaultValidityYears,
     ClassFees,
     PrivilegeLevel,
+ PrivilegeBit,
     ParentClassID
 )
 SELECT
@@ -73,6 +76,7 @@ SELECT
     60,
     5,
     50.00,
+    1,
     1,
     LicenseClassID
 FROM dbo.LicenseClasses
@@ -101,6 +105,7 @@ INSERT INTO dbo.LicenseClasses
     DefaultValidityYears,
     ClassFees,
     PrivilegeLevel,
+ PrivilegeBit,
     ParentClassID
 )
 VALUES
@@ -112,7 +117,8 @@ VALUES
         10,
         250.00,
         108,
-        NULL
+     64,
+     NULL
     );
 GO
 
@@ -139,6 +145,7 @@ INSERT INTO dbo.LicenseClasses
     DefaultValidityYears,
     ClassFees,
     PrivilegeLevel,
+ PrivilegeBit,
     ParentClassID
 )
 SELECT
@@ -149,6 +156,7 @@ SELECT
     10,
     180.00,
     44,
+    32,
     LicenseClassID
 FROM dbo.LicenseClasses
 WHERE ClassName = N'Heavy Truck / Large Bus';
@@ -176,6 +184,7 @@ INSERT INTO dbo.LicenseClasses
     DefaultValidityYears,
     ClassFees,
     PrivilegeLevel,
+ PrivilegeBit,
     ParentClassID
 )
 SELECT
@@ -186,6 +195,7 @@ SELECT
     10,
     150.00,
     12,
+    8,
     LicenseClassID
 FROM dbo.LicenseClasses
 WHERE ClassName = N'Small / Medium Bus';
@@ -209,6 +219,7 @@ INSERT INTO dbo.LicenseClasses
     DefaultValidityYears,
     ClassFees,
     PrivilegeLevel,
+ PrivilegeBit,
     ParentClassID
 )
 SELECT
@@ -218,6 +229,7 @@ SELECT
     70,
     10,
     100.00,
+    4,
     4,
     LicenseClassID
 FROM dbo.LicenseClasses
@@ -240,6 +252,7 @@ INSERT INTO dbo.LicenseClasses
     DefaultValidityYears,
     ClassFees,
     PrivilegeLevel,
+ PrivilegeBit,
     ParentClassID
 )
 VALUES
@@ -251,6 +264,7 @@ VALUES
         10,
         120.00,
         16,
+     16,
         NULL
     );
 GO
@@ -264,6 +278,7 @@ SELECT
     LC.LicenseClassID,
     LC.ClassName,
     LC.PrivilegeLevel,
+    LC.PrivilegeBit,
     Parent.ClassName AS SuperiorClass,
     LC.MinimumAllowedAge,
     LC.MaximumAllowedAge,
