@@ -1,53 +1,135 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using DVLD.Domain.Common;
 
-namespace DVLD.Infrastructure;
+namespace DVLD.Domain.Entities;
 
-public partial class User
+public class User
 {
-    public Guid UserId { get; set; }
+    public Guid UserId { get; private set; }
+    public Guid PersonId { get; private set; }
 
-    public Guid PersonId { get; set; }
+    public string Username { get; private set; } = null!;
+    public string PasswordHash { get; private set; } = null!;
 
-    public string Username { get; set; } = null!;
+    public bool IsActive { get; private set; }
+    public bool IsLocked { get; private set; }
 
-    public string PasswordHash { get; set; } = null!;
+    public int FailedLoginAttempts { get; private set; }
+    public DateTime? LockedUntil { get; private set; }
+    public DateTime? LastLoginAt { get; private set; }
+    public DateTime? PasswordChangedAt { get; private set; }
 
-    public bool IsActive { get; set; }
+    public DateTime CreatedAt { get; private set; }
+    public DateTime? UpdatedAt { get; private set; }
 
-    public bool IsLocked { get; set; }
+    // EF Core
+    private User() { }
 
-    public int FailedLoginAttempts { get; set; }
+    private User(
+        Guid personId,
+        string username,
+        string passwordHash)
+    {
+        PersonId = personId;
+        Username = username;
+        PasswordHash = passwordHash;
 
-    public DateTime? LockedUntil { get; set; }
+        IsActive = true;
+        IsLocked = false;
+        FailedLoginAttempts = 0;
+        PasswordChangedAt = DateTime.UtcNow;
+        CreatedAt = DateTime.UtcNow;
+    }
 
-    public DateTime? LastLoginAt { get; set; }
+    public static User Create(
+        Guid personId,
+        string username,
+        string passwordHash)
+    {
+        if (personId == Guid.Empty)
+            throw new DomainException("Person ID cannot be empty");
 
-    public DateTime? PasswordChangedAt { get; set; }
+        if (string.IsNullOrWhiteSpace(username))
+            throw new DomainException("Username cannot be empty");
 
-    public DateTime CreatedAt { get; set; }
+        if (string.IsNullOrWhiteSpace(passwordHash))
+            throw new DomainException("Password hash cannot be empty");
 
-    public DateTime? UpdatedAt { get; set; }
+        return new User(
+            personId,
+            username.Trim(),
+            passwordHash);
+    }
 
-    public virtual ICollection<Application> Applications { get; set; } = new List<Application>();
+    public void ChangePassword(string passwordHash)
+    {
+        if (string.IsNullOrWhiteSpace(passwordHash))
+            throw new DomainException("Password hash cannot be empty");
 
-    public virtual ICollection<AuditLog> AuditLogs { get; set; } = new List<AuditLog>();
+        PasswordHash = passwordHash;
+        PasswordChangedAt = DateTime.UtcNow;
+        UpdatedAt = DateTime.UtcNow;
+    }
 
-    public virtual ICollection<Detention> DetentionCreatedByUsers { get; set; } = new List<Detention>();
+    public void RecordFailedLogin()
+    {
+        FailedLoginAttempts++;
+        UpdatedAt = DateTime.UtcNow;
+    }
 
-    public virtual ICollection<Detention> DetentionReleasedByUsers { get; set; } = new List<Detention>();
+    public void ResetFailedLoginAttempts()
+    {
+        FailedLoginAttempts = 0;
+        UpdatedAt = DateTime.UtcNow;
+    }
 
-    public virtual ICollection<Driver> Drivers { get; set; } = new List<Driver>();
+    public void RecordSuccessfulLogin()
+    {
+        LastLoginAt = DateTime.UtcNow;
+        FailedLoginAttempts = 0;
+        IsLocked = false;
+        LockedUntil = null;
+        UpdatedAt = DateTime.UtcNow;
+    }
 
-    public virtual ICollection<License> Licenses { get; set; } = new List<License>();
+    public void Lock(DateTime? lockedUntil = null)
+    {
+        IsLocked = true;
+        LockedUntil = lockedUntil;
+        UpdatedAt = DateTime.UtcNow;
+    }
 
-    public virtual Person Person { get; set; } = null!;
+    public void Unlock()
+    {
+        IsLocked = false;
+        LockedUntil = null;
+        FailedLoginAttempts = 0;
+        UpdatedAt = DateTime.UtcNow;
+    }
 
-    public virtual ICollection<TestAppointment> TestAppointments { get; set; } = new List<TestAppointment>();
+    public void Activate()
+    {
+        if (IsActive)
+            throw new DomainException("User is already active");
 
-    public virtual ICollection<Test> Tests { get; set; } = new List<Test>();
+        IsActive = true;
+        UpdatedAt = DateTime.UtcNow;
+    }
 
-    public virtual ICollection<UserRole> UserRoleAssignedByNavigations { get; set; } = new List<UserRole>();
+    public void Deactivate()
+    {
+        if (!IsActive)
+            throw new DomainException("User is already inactive");
 
-    public virtual ICollection<UserRole> UserRoleUsers { get; set; } = new List<UserRole>();
+        IsActive = false;
+        UpdatedAt = DateTime.UtcNow;
+    }
+
+    public void UpdateUsername(string username)
+    {
+        if (string.IsNullOrWhiteSpace(username))
+            throw new DomainException("Username cannot be empty");
+
+        Username = username.Trim();
+        UpdatedAt = DateTime.UtcNow;
+    }
 }

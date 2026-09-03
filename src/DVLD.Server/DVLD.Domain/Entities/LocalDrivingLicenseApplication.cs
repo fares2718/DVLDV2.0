@@ -1,19 +1,42 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using DVLD.Domain.Common;
 
-namespace DVLD.Infrastructure;
+namespace DVLD.Domain.Entities;
 
-public partial class LocalDrivingLicenseApplication
+public class LocalDrivingLicenseApplication
 {
-    public int LocalDrivingLicenseApplicationId { get; set; }
+    public int LocalDrivingLicenseApplicationId { get; private set; }
 
-    public int ApplicationId { get; set; }
+    public int ApplicationId { get; private set; }
 
-    public int LicenseClassId { get; set; }
+    public int LicenseClassId { get; private set; }
 
-    public virtual Application Application { get; set; } = null!;
+    // For EF Core
+    private LocalDrivingLicenseApplication()
+    {
+    }
 
-    public virtual LicenseClass LicenseClass { get; set; } = null!;
+    private LocalDrivingLicenseApplication(
+        int applicationId,
+        int licenseClassId)
+    {
+        ApplicationId = applicationId;
+        LicenseClassId = licenseClassId;
+    }
 
-    public virtual ICollection<TestAppointment> TestAppointments { get; set; } = new List<TestAppointment>();
+    public static LocalDrivingLicenseApplication Create(
+        int applicationId,
+        int licenseClassId)
+    {
+        if (applicationId <= 0)
+            throw new DomainException(
+                "Application ID must be positive");
+
+        if (licenseClassId <= 0)
+            throw new DomainException(
+                "License Class ID must be positive");
+
+        return new LocalDrivingLicenseApplication(
+            applicationId,
+            licenseClassId);
+    }
 }

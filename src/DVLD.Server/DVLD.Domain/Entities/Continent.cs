@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿namespace DVLD.Domain.Entities;
 
-namespace DVLD.Infrastructure;
-
-public partial class Continent
+public class Continent
 {
-    public string ContinentCode { get; set; } = null!;
+    public string ContinentCode { get; private set; } = null!;
 
-    public string? ContinentName { get; set; }
-
-    public virtual ICollection<Country> Countries { get; set; } = new List<Country>();
+    public string? ContinentName { get; private set; }
+    
+    //For EF Core
+    private Continent(){}
 }

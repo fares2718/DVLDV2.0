@@ -1,47 +1,152 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using DVLD.Domain.Common;
 
-namespace DVLD.Infrastructure;
+namespace DVLD.Domain.Entities;
 
-public partial class License
+public enum LicenseIssueReason : byte
 {
-    public Guid LicenseId { get; set; }
+    NewLocalDrivingLicense = 1,
+    RenewDrivingLicense = 2,
+    ReplaceLostLicense = 3,
+    ReplaceDamagedLicense = 4,
+}
 
-    public Guid DriverId { get; set; }
+public class License
+{
+    public Guid LicenseId { get; private set; }
 
-    public int LicenseClassId { get; set; }
+    public Guid DriverId { get; private set; }
 
-    public DateOnly IssueDate { get; set; }
+    public int LicenseClassId { get; private set; }
 
-    public DateOnly ExpirationDate { get; set; }
+    public DateOnly IssueDate { get; private set; }
 
-    public bool IsActive { get; set; }
+    public DateOnly ExpirationDate { get; private set; }
 
-    public byte IssueReason { get; set; }
+    public bool IsActive { get; private set; }
 
-    public string? Notes { get; set; }
+    public LicenseIssueReason IssueReason { get; private set; }
 
-    public int ApplicationId { get; set; }
+    public string? Notes { get; private set; }
 
-    public DateTime CreatedAt { get; set; }
+    public int ApplicationId { get; private set; }
 
-    public DateTime? UpdatedAt { get; set; }
+    public DateTime CreatedAt { get; private set; }
 
-    public decimal PaidFees { get; set; }
+    public DateTime? UpdatedAt { get; private set; }
 
-    public Guid CreatedByUserId { get; set; }
+    public decimal PaidFees { get; private set; }
 
-    public virtual Application Application { get; set; } = null!;
+    public Guid CreatedByUserId { get; private set; }
 
-    public virtual ICollection<Application> Applications { get; set; } = new List<Application>();
+    // For EF Core
+    private License()
+    {
+    }
 
-    public virtual User CreatedByUser { get; set; } = null!;
+    private License(
+        Guid driverId,
+        int licenseClassId,
+        DateOnly issueDate,
+        DateOnly expirationDate,
+        LicenseIssueReason issueReason,
+        string? notes,
+        int applicationId,
+        decimal paidFees,
+        Guid createdByUserId)
+    {
+        LicenseId = Guid.NewGuid();
 
-    public virtual ICollection<Detention> Detentions { get; set; } = new List<Detention>();
+        DriverId = driverId;
+        LicenseClassId = licenseClassId;
+        IssueDate = issueDate;
+        ExpirationDate = expirationDate;
+        IssueReason = issueReason;
+        Notes = notes;
+        ApplicationId = applicationId;
+        PaidFees = paidFees;
+        CreatedByUserId = createdByUserId;
 
-    public virtual Driver Driver { get; set; } = null!;
+        IsActive = true;
+        CreatedAt = DateTime.UtcNow;
+    }
 
-    public virtual ICollection<InternationalLicense> InternationalLicenses { get; set; } = new List<InternationalLicense>();
+    public static License Create(
+        Guid driverId,
+        int licenseClassId,
+        DateOnly issueDate,
+        DateOnly expirationDate,
+        LicenseIssueReason issueReason,
+        string? notes,
+        int applicationId,
+        decimal paidFees,
+        Guid createdByUserId)
+    {
+        if (driverId == Guid.Empty)
+            throw new DomainException("Driver ID cannot be empty");
 
-    public virtual LicenseClass LicenseClass { get; set; } = null!;
+        if (licenseClassId <= 0)
+            throw new DomainException(
+                "License Class ID must be positive");
+
+        if (applicationId <= 0)
+            throw new DomainException(
+                "Application ID must be positive");
+
+        if (createdByUserId == Guid.Empty)
+            throw new DomainException(
+                "Creator User ID cannot be empty");
+
+        if (expirationDate <= issueDate)
+            throw new DomainException(
+                "Expiration Date must be after Issue Date");
+
+        if (paidFees < 0)
+            throw new DomainException(
+                "Paid Fees cannot be negative");
+
+        if (!Enum.IsDefined(issueReason))
+            throw new DomainException(
+                $"Invalid License Issue Reason: {issueReason}");
+
+        return new License(
+            driverId,
+            licenseClassId,
+            issueDate,
+            expirationDate,
+            issueReason,
+            notes,
+            applicationId,
+            paidFees,
+            createdByUserId);
+    }
+
+    public void Deactivate()
+    {
+        if (!IsActive)
+            throw new DomainException(
+                "License is already inactive");
+
+        IsActive = false;
+        UpdatedAt = DateTime.UtcNow;
+    }
+
+    public void Activate()
+    {
+        if (IsActive)
+            throw new DomainException(
+                "License is already active");
+
+        if (ExpirationDate < DateOnly.FromDateTime(DateTime.UtcNow))
+            throw new DomainException(
+                "Expired License cannot be activated");
+
+        IsActive = true;
+        UpdatedAt = DateTime.UtcNow;
+    }
+
+    public void UpdateNotes(string? notes)
+    {
+        Notes = notes;
+        UpdatedAt = DateTime.UtcNow;
+    }
 }

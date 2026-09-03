@@ -1,21 +1,45 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using DVLD.Domain.Common;
 
-namespace DVLD.Infrastructure;
+namespace DVLD.Domain.Entities;
 
-public partial class UserRole
+public class UserRole
 {
-    public Guid UserId { get; set; }
+    public Guid UserId { get; private set; }
+    public int RoleId { get; private set; }
+    public DateTime AssignedAt { get; private set; }
+    public Guid? AssignedBy { get; private set; }
 
-    public int RoleId { get; set; }
+    // EF Core
+    private UserRole() { }
 
-    public DateTime AssignedAt { get; set; }
+    private UserRole(
+        Guid userId,
+        int roleId,
+        Guid? assignedBy)
+    {
+        UserId = userId;
+        RoleId = roleId;
+        AssignedBy = assignedBy;
+        AssignedAt = DateTime.UtcNow;
+    }
 
-    public Guid? AssignedBy { get; set; }
+    public static UserRole Assign(
+        Guid userId,
+        int roleId,
+        Guid? assignedBy = null)
+    {
+        if (userId == Guid.Empty)
+            throw new DomainException("User ID cannot be empty");
 
-    public virtual User? AssignedByNavigation { get; set; }
+        if (roleId <= 0)
+            throw new DomainException("Role ID must be greater than zero");
 
-    public virtual Role Role { get; set; } = null!;
+        if (assignedBy.HasValue && assignedBy.Value == Guid.Empty)
+            throw new DomainException("Assigned By cannot be empty");
 
-    public virtual User User { get; set; } = null!;
+        return new UserRole(
+            userId,
+            roleId,
+            assignedBy);
+    }
 }

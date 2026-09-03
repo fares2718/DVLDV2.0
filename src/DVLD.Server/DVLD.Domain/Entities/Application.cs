@@ -1,51 +1,95 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using DVLD.Domain.Common;
 
-namespace DVLD.Infrastructure;
+namespace DVLD.Domain.Entities;
 
-public partial class Application
+
+public enum ApplicationStatus : byte
 {
-    public int ApplicationId { get; set; }
+    New = 1,
+    Completed = 2,
+    Cancelled = 3,
+}
+public class Application
+{
+    public int ApplicationId { get; private set; }
 
-    public Guid ApplicantPersonId { get; set; }
+    public Guid ApplicantPersonId { get; private set; }
 
-    public int ApplicationTypeId { get; set; }
+    public int ApplicationTypeId { get; private set; }
 
-    public DateTime ApplicationDate { get; set; }
+    public DateTime ApplicationDate { get; private set; }
 
-    public byte Status { get; set; }
+    public ApplicationStatus Status { get; private set; }
 
-    public decimal PaidFees { get; set; }
+    public decimal PaidFees { get; private set; }
 
-    public Guid CreatedByUserId { get; set; }
+    public Guid CreatedByUserId { get; private set; }
 
-    public DateTime LastStatusDate { get; set; }
+    public DateTime LastStatusDate { get; private set; }
 
-    public Guid? RelatedLicenseId { get; set; }
+    public Guid? RelatedLicenseId { get; private set; }
 
-    public int? RelatedApplicationId { get; set; }
+    public int? RelatedApplicationId { get; private set; }
 
-    public DateTime CreatedAt { get; set; }
+    public DateTime CreatedAt { get; private set; }
 
-    public DateTime? UpdatedAt { get; set; }
+    public DateTime? UpdatedAt { get; private set; }
+    
+    //For EF Core
+    private Application(){}
 
-    public virtual Person ApplicantPerson { get; set; } = null!;
+    private Application(Guid applicantPersonId, int applicationTypeId, DateTime applicationDate , decimal paidFees,
+        Guid createdByUserId, Guid? relatedLicenseId, int? relatedApplicationId)
+    {
+        ApplicantPersonId = applicantPersonId;
+        ApplicationTypeId = applicationTypeId;
+        ApplicationDate = applicationDate;
+        PaidFees = paidFees;
+        CreatedByUserId = createdByUserId;
+        ApplicationDate = DateTime.UtcNow;
+        Status = ApplicationStatus.New;
+        LastStatusDate = DateTime.UtcNow;
+        RelatedLicenseId = relatedLicenseId;
+        RelatedApplicationId = relatedApplicationId;
+    }
 
-    public virtual ApplicationType ApplicationType { get; set; } = null!;
+    public static Application Create(Guid applicantPersonId, int applicationTypeId, decimal paidFees,
+        Guid createdByUserId, Guid? relatedLicenseId, int? relatedApplicationId,DateTime? applicationDate)
+    {
+        if (applicantPersonId == Guid.Empty)
+            throw new DomainException("Applicant Person ID cannot be empty");
+        if (applicationTypeId < 1)
+            throw new DomainException("Application Type ID must be positive");
+        if (paidFees < 0)
+            throw new DomainException("Paid Fees must be positive");
+        if(createdByUserId == Guid.Empty)
+            throw new DomainException("Creator User ID cannot be empty");
+        return new Application(applicantPersonId, applicationTypeId, applicationDate ?? DateTime.UtcNow
+            ,paidFees, createdByUserId, relatedLicenseId, relatedApplicationId);
+    }
 
-    public virtual User CreatedByUser { get; set; } = null!;
+    public void Complete()
+    {
+        EnsureStatus(ApplicationStatus.New);
 
-    public virtual ICollection<Detention> Detentions { get; set; } = new List<Detention>();
+        Status = ApplicationStatus.Completed;
+        LastStatusDate = DateTime.UtcNow;
+        UpdatedAt = DateTime.UtcNow;
+    }
 
-    public virtual ICollection<InternationalLicense> InternationalLicenses { get; set; } = new List<InternationalLicense>();
+    public void Cancel()
+    {
+        EnsureStatus(ApplicationStatus.New);
 
-    public virtual ICollection<Application> InverseRelatedApplication { get; set; } = new List<Application>();
+        Status = ApplicationStatus.Cancelled;
+        LastStatusDate = DateTime.UtcNow;
+        UpdatedAt = DateTime.UtcNow;
+    }
 
-    public virtual ICollection<License> Licenses { get; set; } = new List<License>();
-
-    public virtual LocalDrivingLicenseApplication? LocalDrivingLicenseApplication { get; set; }
-
-    public virtual Application? RelatedApplication { get; set; }
-
-    public virtual License? RelatedLicense { get; set; }
+    private void EnsureStatus(ApplicationStatus expected)
+    {
+        if (Status != expected)
+            throw new DomainException(
+                $"Application must be {expected}");
+    }
 }
