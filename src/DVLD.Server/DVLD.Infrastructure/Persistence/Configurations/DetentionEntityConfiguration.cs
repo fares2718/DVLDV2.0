@@ -2,7 +2,7 @@ using DVLD.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace DVLD.Infrastructure.EntitiesConfigurations;
+namespace DVLD.Infrastructure.Persistence.Configurations;
 
 public class DetentionEntityConfiguration : IEntityTypeConfiguration<Detention>
 {
@@ -47,7 +47,7 @@ public class DetentionEntityConfiguration : IEntityTypeConfiguration<Detention>
             .OnDelete(DeleteBehavior.ClientSetNull)
             .HasConstraintName("FK_Detentions_License");
 
-        builder.HasOne<Application>().WithMany()
+        builder.HasOne<Domain.Entities.Application>().WithMany()
             .HasForeignKey(d => d.ReleaseApplicationId)
             .HasConstraintName("FK_Detentions_ReleaseApplication");
 

@@ -1,18 +1,14 @@
 ﻿using DVLD.Domain.Entities;
+using DVLD.Domain.Views;
 using Microsoft.EntityFrameworkCore;
 
-namespace DVLD.Infrastructure.Data;
+namespace DVLD.Infrastructure.Persistence.Context;
 
-public partial class DvldContext : DbContext
+public partial class DvldContext(DbContextOptions<DvldContext> options) : DbContext(options)
 {
-    public DvldContext(DbContextOptions<DvldContext> options)
-        : base(options)
-    {
-    }
-
     public virtual DbSet<Address> Addresses { get; set; }
 
-    public virtual DbSet<Application> Applications { get; set; }
+    public virtual DbSet<Domain.Entities.Application> Applications { get; set; }
 
     public virtual DbSet<ApplicationType> ApplicationTypes { get; set; }
 
@@ -47,6 +43,8 @@ public partial class DvldContext : DbContext
     public virtual DbSet<User> Users { get; set; }
 
     public virtual DbSet<UserRole> UserRoles { get; set; }
+    
+    public virtual DbSet<PersonSummary> PeopleSummaries { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -2,7 +2,7 @@ using DVLD.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace DVLD.Infrastructure.EntitiesConfigurations;
+namespace DVLD.Infrastructure.Persistence.Configurations;
 
 public class InternationalLicenseEntityConfiguration : IEntityTypeConfiguration<InternationalLicense>
 {
@@ -26,7 +26,7 @@ public class InternationalLicenseEntityConfiguration : IEntityTypeConfiguration<
         builder.Property(e => e.IssuedUsingLocalLicenseId).HasColumnName("IssuedUsingLocalLicenseID");
         builder.Property(e => e.UpdatedAt).HasPrecision(3);
 
-        builder.HasOne<Application>().WithMany()
+        builder.HasOne<Domain.Entities.Application>().WithMany()
             .HasForeignKey(d => d.ApplicationId)
             .OnDelete(DeleteBehavior.ClientSetNull)
             .HasConstraintName("FK_InternationalLicenses_Application");

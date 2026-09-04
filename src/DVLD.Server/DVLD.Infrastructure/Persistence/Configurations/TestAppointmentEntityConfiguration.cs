@@ -2,7 +2,7 @@ using DVLD.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace DVLD.Infrastructure.EntitiesConfigurations;
+namespace DVLD.Infrastructure.Persistence.Configurations;
 
 public class TestAppointmentEntityConfiguration : IEntityTypeConfiguration<TestAppointment>
 {

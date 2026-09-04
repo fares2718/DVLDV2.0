@@ -2,11 +2,11 @@ using DVLD.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace DVLD.Infrastructure.EntitiesConfigurations;
+namespace DVLD.Infrastructure.Persistence.Configurations;
 
-public class ApplicationEntityConfiguration : IEntityTypeConfiguration<Application>
+public class ApplicationEntityConfiguration : IEntityTypeConfiguration<Domain.Entities.Application>
 {
-    public void Configure(EntityTypeBuilder<Application> builder)
+    public void Configure(EntityTypeBuilder<Domain.Entities.Application> builder)
     {
         builder.HasIndex(e => e.ApplicantPersonId, "IX_Applications_ApplicantPersonID");
 
@@ -60,7 +60,7 @@ public class ApplicationEntityConfiguration : IEntityTypeConfiguration<Applicati
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Applications_CreatedByUser");
 
-            builder.HasOne<Application>().WithMany()
+            builder.HasOne<Domain.Entities.Application>().WithMany()
                 .HasForeignKey(d => d.RelatedApplicationId)
                 .HasConstraintName("FK_Applications_RelatedApplication");
 

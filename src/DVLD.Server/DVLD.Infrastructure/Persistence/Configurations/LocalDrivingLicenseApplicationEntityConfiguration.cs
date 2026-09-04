@@ -2,7 +2,7 @@ using DVLD.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace DVLD.Infrastructure.EntitiesConfigurations;
+namespace DVLD.Infrastructure.Persistence.Configurations;
 
 public class LocalDrivingLicenseApplicationEntityConfiguration : IEntityTypeConfiguration<LocalDrivingLicenseApplication>
 {
@@ -17,7 +17,7 @@ public class LocalDrivingLicenseApplicationEntityConfiguration : IEntityTypeConf
         builder.Property(e => e.ApplicationId).HasColumnName("ApplicationID");
         builder.Property(e => e.LicenseClassId).HasColumnName("LicenseClassID");
 
-        builder.HasOne<Application>().WithOne()
+        builder.HasOne<Domain.Entities.Application>().WithOne()
             .HasForeignKey<LocalDrivingLicenseApplication>(d => d.ApplicationId)
             .OnDelete(DeleteBehavior.ClientSetNull)
             .HasConstraintName("FK_LocalDrivingLicenseApplications_Application");
