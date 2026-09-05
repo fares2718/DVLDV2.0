@@ -1,5 +1,5 @@
 using DVLD.Application.Features.People.Create;
-using DVLD.Contracts.People;
+using DVLD.Application.Features.People.Get;
 using ErrorOr;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -22,23 +22,9 @@ namespace DVLD.API.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
 
-        public async Task<IActionResult> Create([FromBody]CreatePersonRequest request)
+        public async Task<IActionResult> Create([FromBody]CreatePersonCommand cmd,CancellationToken cancellationToken)
         {
-            var cmd = new CreatePersonCommand(
-                request.NationalId,
-                request.FirstName,
-                request.SecondName,
-                request.ThirdName,
-                request.LastName,
-                request.MotherName,
-                request.DateOfBirth,
-                request.Phone,
-                request.Gender,
-                request.Email,
-                request.NationalityCountryCode,
-                request.ImagePath,
-                request.AltPhone);
-            var result = await _sender.Send(cmd);
+            var result = await _sender.Send(cmd, cancellationToken);
 
             if (result.IsError)
             {
@@ -51,5 +37,22 @@ namespace DVLD.API.Controllers
 
             return StatusCode(StatusCodes.Status201Created);
         }
+
+        [HttpGet("GetPeople")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+
+        public async Task<IActionResult> GetPeople([FromQuery]GetPeopleQuery query,CancellationToken cancellationToken)
+        {
+            var result = await _sender.Send(query, cancellationToken);
+            if(result.IsError)
+                return result.FirstError.Type switch
+                {
+                    ErrorType.Validation => BadRequest(result.Errors),
+                    _ => Problem(statusCode:StatusCodes.Status500InternalServerError,detail:result.FirstError.Description)
+                };
+            return Ok(result.Value);
+        }
+        
     }
 }

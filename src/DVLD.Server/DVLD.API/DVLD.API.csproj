@@ -20,7 +20,6 @@
 
     <ItemGroup>
       <ProjectReference Include="..\DVLD.Application\DVLD.Application.csproj" />
-      <ProjectReference Include="..\DVLD.Contracts\DVLD.Contracts.csproj" />
       <ProjectReference Include="..\DVLD.Infrastructure\DVLD.Infrastructure.csproj" />
     </ItemGroup>
 

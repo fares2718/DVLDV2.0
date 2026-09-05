@@ -29,7 +29,7 @@ public class CreatePersonCommandHandler
             request.MotherName,request.DateOfBirth,request.Phone,request.Gender,request.Email,
             request.NationalityCountryCode,request.ImagePath,request.AltPhone);
         
-        await _uow.PersonRepository.AddAsync(person);
+        await _uow.PersonRepository.AddAsync(person, cancellationToken);
         return Result.Created;
     }
 }
