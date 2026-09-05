@@ -28,7 +28,7 @@ public class AddressEntityConfiguration
         // Address Type
         builder.Property(e => e.AddressType)
             .HasConversion<byte>()
-            .HasDefaultValue((byte)1)
+            .HasDefaultValue(AddressType.Home)
             .IsRequired();
 
         // Country

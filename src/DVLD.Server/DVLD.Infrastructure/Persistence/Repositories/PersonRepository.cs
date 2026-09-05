@@ -37,4 +37,14 @@ public class PersonRepository(DvldContext dvldContext) : IPersonRepository
         var personSummary = await _dvldContext.PeopleSummaries.FindAsync(personId);
         return personSummary;
     }
+
+    public async Task<bool> IsNationalIdUnique(string nationalId)
+    {
+        return !await _dvldContext.People.AnyAsync(p => p.NationalId == nationalId);
+    }
+
+    public async Task<bool> IsEmailUnique(string email)
+    {
+        return !await _dvldContext.People.AnyAsync(p => p.Email == email);
+    }
 }

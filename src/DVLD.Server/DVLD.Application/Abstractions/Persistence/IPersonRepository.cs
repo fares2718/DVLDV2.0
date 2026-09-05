@@ -9,4 +9,6 @@ public interface IPersonRepository
     Task DeleteAsync(Guid personId);
     Task<IReadOnlyList<PersonSummary>> GetAllSummaryAsync();
     Task<PersonSummary?> GetSummaryByIdAsync(Guid personId);
+    Task<bool> IsNationalIdUnique(string nationalId);
+    Task<bool> IsEmailUnique(string email);
 }

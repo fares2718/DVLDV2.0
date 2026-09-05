@@ -41,7 +41,7 @@ public class ApplicationEntityConfiguration : IEntityTypeConfiguration<Domain.En
             builder.Property(e => e.RelatedApplicationId).HasColumnName("RelatedApplicationID");
             builder.Property(e => e.RelatedLicenseId).HasColumnName("RelatedLicenseID");
             builder.Property(e => e.Status).HasConversion<byte>()
-                .HasDefaultValue((byte)1)
+                .HasDefaultValue(ApplicationStatus.New)
                 .IsRequired();
             builder.Property(e => e.UpdatedAt).HasPrecision(3);
 
