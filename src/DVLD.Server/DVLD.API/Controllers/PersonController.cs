@@ -136,5 +136,41 @@ namespace DVLD.API.Controllers
             return Ok("Person name has been updated successfully");
         }
         
+        [HttpPatch("update-person-contact-info")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        
+        public async Task<IActionResult> UpdateContactInfo([FromBody] UpdatePersonContactInfoCommand cmd,CancellationToken cancellationToken)
+        {
+            var result = await _sender.Send(cmd, cancellationToken);
+            if(result.IsError)
+                return result.FirstError.Type switch
+                {
+                    ErrorType.Validation => BadRequest(result.Errors),
+                    ErrorType.NotFound =>  NotFound(result.Errors),
+                    _ => Problem(statusCode:StatusCodes.Status500InternalServerError,detail:result.FirstError.Description)
+                };
+            return Ok("Person contact info has been updated successfully");
+        }
+        
+        [HttpPatch("update-personal-info")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        
+        public async Task<IActionResult> UpdatePersonalInfo([FromBody] UpdatePersonalInfoCommand cmd,CancellationToken cancellationToken)
+        {
+            var result = await _sender.Send(cmd, cancellationToken);
+            if(result.IsError)
+                return result.FirstError.Type switch
+                {
+                    ErrorType.Validation => BadRequest(result.Errors),
+                    ErrorType.NotFound =>  NotFound(result.Errors),
+                    _ => Problem(statusCode:StatusCodes.Status500InternalServerError,detail:result.FirstError.Description)
+                };
+            return Ok("Personal info has been updated successfully");
+        }
+        
     }
 }

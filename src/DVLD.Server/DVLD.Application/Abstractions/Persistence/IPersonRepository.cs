@@ -24,4 +24,11 @@ public interface IPersonRepository
         string lastName,
         string motherName,
         CancellationToken cancellationToken);
+
+    Task UpdatePersonContactInfo(Guid personId,
+        string phone, string? altPhone,
+        CancellationToken cancellationToken);
+
+    Task UpdatePersonalInfo(Guid personId, DateOnly dateOfBirth,
+        string nationalityCountryCode, CancellationToken cancellationToken);
 }

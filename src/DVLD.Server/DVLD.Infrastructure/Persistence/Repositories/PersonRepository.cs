@@ -16,7 +16,7 @@ public class PersonRepository(DvldContext dvldContext) : IPersonRepository
 
     public async Task ActivateAsync(Guid personId,CancellationToken cancellationToken)
     {
-        var person = await _dvldContext.People.FindAsync(personId, cancellationToken);
+        var person = await GetPersonById(personId, cancellationToken);
         if (person == null)
             throw new KeyNotFoundException($"Person with ID {personId} was not found.");
         person.Activate();
@@ -36,7 +36,7 @@ public class PersonRepository(DvldContext dvldContext) : IPersonRepository
 
     public async Task DeActivateAsync(Guid personId, CancellationToken cancellationToken)
     {
-        var person = await _dvldContext.People.FindAsync(personId, cancellationToken);
+        var person = await GetPersonById(personId, cancellationToken);
         if (person == null)
             throw new KeyNotFoundException($"Person with ID {personId} was not found.");
         person.Deactivate();
@@ -135,6 +135,12 @@ public class PersonRepository(DvldContext dvldContext) : IPersonRepository
                query.PageSize);
     }
 
+    private async Task<Person?> GetPersonById(Guid personId, CancellationToken cancellationToken)
+    {
+        var person = await _dvldContext.People.FindAsync(personId, cancellationToken);
+        return person;
+    }
+
     public async Task<PersonSummary?> GetSummaryByIdAsync(Guid personId,CancellationToken cancellationToken)
     {
         var personSummary = await _dvldContext.PeopleSummaries
@@ -155,10 +161,29 @@ public class PersonRepository(DvldContext dvldContext) : IPersonRepository
     public async Task UpdatePersonName(Guid personId,string firstName, string secondName, string? thirdName, string lastName, string motherName,
         CancellationToken cancellationToken)
     {
-        var person = await _dvldContext.People.FindAsync(personId, cancellationToken);
+        var person = await GetPersonById(personId, cancellationToken);
         if (person is null)
             throw new KeyNotFoundException($"Person with ID {personId} was not found.");
         person.UpdateName(firstName, secondName, thirdName, lastName, motherName);
+        await _dvldContext.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task UpdatePersonContactInfo(Guid personId,string phone, string? altPhone,CancellationToken cancellationToken)
+    {
+        var person = await GetPersonById(personId, cancellationToken);
+        if (person is null)
+            throw new KeyNotFoundException($"Person with ID {personId} was not found.");
+        person.UpdateContactInfo(phone, altPhone);
+        await _dvldContext.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task UpdatePersonalInfo(Guid personId, DateOnly dateOfBirth, string nationalityCountryCode,
+        CancellationToken cancellationToken)
+    {
+        var person = await GetPersonById(personId, cancellationToken);
+        if (person is null)
+            throw new KeyNotFoundException($"Person with ID {personId} was not found.");
+        person.UpdatePersonalInfo(dateOfBirth, nationalityCountryCode);
         await _dvldContext.SaveChangesAsync(cancellationToken);
     }
 }

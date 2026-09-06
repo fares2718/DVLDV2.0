@@ -141,14 +141,11 @@ public class Person
 
     public void UpdateContactInfo(
         string phone,
-        string email,
         string? altPhone)
     {
         ValidateRequiredText(phone, "Phone");
-        ValidateRequiredText(email, "Email");
 
         Phone = phone.Trim();
-        Email = email.Trim();
         AltPhone = NormalizeOptional(altPhone);
     }
 
