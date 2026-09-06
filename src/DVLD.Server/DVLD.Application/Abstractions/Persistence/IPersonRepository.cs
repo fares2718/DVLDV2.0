@@ -15,4 +15,13 @@ public interface IPersonRepository
     Task<PersonSummary?> GetSummaryByIdAsync(Guid personId, CancellationToken cancellationToken);
     Task<bool> IsNationalIdUnique(string nationalId);
     Task<bool> IsEmailUnique(string email);
+
+    Task UpdatePersonName(
+        Guid personId,
+        string firstName,
+        string secondName,
+        string? thirdName,
+        string lastName,
+        string motherName,
+        CancellationToken cancellationToken);
 }

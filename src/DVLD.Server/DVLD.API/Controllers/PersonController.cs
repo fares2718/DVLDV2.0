@@ -1,6 +1,7 @@
 using DVLD.Application.Features.People.Activation;
 using DVLD.Application.Features.People.Create;
 using DVLD.Application.Features.People.Get;
+using DVLD.Application.Features.People.Update;
 using ErrorOr;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -114,6 +115,25 @@ namespace DVLD.API.Controllers
                     _ => Problem(statusCode:StatusCodes.Status500InternalServerError,detail:result.FirstError.Description)
                 };
             return Ok(result.Value);
+        }
+
+        [HttpPatch("update-person-name")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+
+        public async Task<IActionResult> UpdateName([FromBody] UpdatePersonNameCommand cmd,
+            CancellationToken cancellationToken)
+        {
+            var result = await _sender.Send(cmd, cancellationToken);
+            if(result.IsError)
+                return result.FirstError.Type switch
+                {
+                    ErrorType.Validation => BadRequest(result.Errors),
+                    ErrorType.NotFound =>  NotFound(result.Errors),
+                    _ => Problem(statusCode:StatusCodes.Status500InternalServerError,detail:result.FirstError.Description)
+                };
+            return Ok("Person name has been updated successfully");
         }
         
     }

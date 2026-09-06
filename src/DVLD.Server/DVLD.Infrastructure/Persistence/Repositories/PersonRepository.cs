@@ -151,4 +151,14 @@ public class PersonRepository(DvldContext dvldContext) : IPersonRepository
     {
         return !await _dvldContext.People.AnyAsync(p => p.Email == email);
     }
+
+    public async Task UpdatePersonName(Guid personId,string firstName, string secondName, string? thirdName, string lastName, string motherName,
+        CancellationToken cancellationToken)
+    {
+        var person = await _dvldContext.People.FindAsync(personId, cancellationToken);
+        if (person is null)
+            throw new KeyNotFoundException($"Person with ID {personId} was not found.");
+        person.UpdateName(firstName, secondName, thirdName, lastName, motherName);
+        await _dvldContext.SaveChangesAsync(cancellationToken);
+    }
 }

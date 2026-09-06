@@ -154,7 +154,6 @@ public class Person
 
     public void UpdatePersonalInfo(
         DateOnly dateOfBirth,
-        bool gender,
         string nationalityCountryCode)
     {
         ValidateDateOfBirth(dateOfBirth);
@@ -164,7 +163,6 @@ public class Person
             "Nationality Country Code");
 
         DateOfBirth = dateOfBirth;
-        Gender = gender;
         NationalityCountryCode = nationalityCountryCode.Trim();
     }
 
