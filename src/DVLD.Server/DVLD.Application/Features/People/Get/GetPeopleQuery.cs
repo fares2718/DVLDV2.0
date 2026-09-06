@@ -11,8 +11,10 @@ public sealed record GetPeopleQuery(
     string? Name,
     string? Gender,
     string? Phone,
+    string? Email,
     string? SortBy,
     bool IsDescending,
+    bool? IsActive,
     int PageNumber = 1,
     int PageSize = 10
 ) : IRequest<ErrorOr<PagedList<PersonSummary>>>;

@@ -7,8 +7,9 @@ namespace DVLD.Application.Abstractions.Persistence;
 
 public interface IPersonRepository
 {
+    Task ActivateAsync(Guid personId,CancellationToken cancellationToken);
     Task AddAsync(Person person, CancellationToken cancellationToken);
-    Task DeleteAsync(Guid personId, CancellationToken cancellationToken);
+    Task DeActivateAsync(Guid personId, CancellationToken cancellationToken);
     Task<PagedList<PersonSummary>> GetPeopleSummaryAsync( GetPeopleQuery query,
         CancellationToken cancellationToken);
     Task<PersonSummary?> GetSummaryByIdAsync(Guid personId, CancellationToken cancellationToken);

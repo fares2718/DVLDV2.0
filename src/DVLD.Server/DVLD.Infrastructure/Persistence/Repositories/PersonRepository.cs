@@ -1,6 +1,7 @@
 using DVLD.Application.Abstractions.Persistence;
 using DVLD.Application.DTOs;
 using DVLD.Application.Features.People.Get;
+using DVLD.Domain.Common;
 using DVLD.Domain.Entities;
 using DVLD.Domain.Views;
 using DVLD.Infrastructure.Persistence.Context;
@@ -13,18 +14,32 @@ public class PersonRepository(DvldContext dvldContext) : IPersonRepository
     private readonly DvldContext _dvldContext = dvldContext;
 
 
+    public async Task ActivateAsync(Guid personId,CancellationToken cancellationToken)
+    {
+        var person = await _dvldContext.People.FindAsync(personId, cancellationToken);
+        if (person == null)
+            throw new KeyNotFoundException($"Person with ID {personId} was not found.");
+        person.Activate();
+        await _dvldContext.SaveChangesAsync(cancellationToken);
+    }
+
     public async Task AddAsync(Person person,CancellationToken cancellationToken)
     {
+        if (await IsNationalIdUnique(person.NationalId))
+            throw new DomainException("National ID already exists.");
+        if(await IsEmailUnique(person.Email))
+            throw new DomainException("Email already exists.");
+        
         _dvldContext.Add(person);
         await _dvldContext.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task DeleteAsync(Guid personId, CancellationToken cancellationToken)
+    public async Task DeActivateAsync(Guid personId, CancellationToken cancellationToken)
     {
         var person = await _dvldContext.People.FindAsync(personId, cancellationToken);
         if (person == null)
-            return;
-        _dvldContext.People.Remove(person);
+            throw new KeyNotFoundException($"Person with ID {personId} was not found.");
+        person.Deactivate();
         await _dvldContext.SaveChangesAsync(cancellationToken);
     }
     
@@ -32,6 +47,9 @@ public class PersonRepository(DvldContext dvldContext) : IPersonRepository
         CancellationToken cancellationToken)
     {
         var peopleSummary = _dvldContext.PeopleSummaries.AsNoTracking();
+
+        if (query.IsActive.HasValue)
+            peopleSummary = peopleSummary.Where(p => p.IsActive == query.IsActive);
         if (!string.IsNullOrWhiteSpace(query.Search))
         {
             var search = query.Search.Trim();
@@ -65,8 +83,13 @@ public class PersonRepository(DvldContext dvldContext) : IPersonRepository
                 p.Phone.Contains(query.Phone));
         }
         
-        var totalCount = await peopleSummary.CountAsync(
-               cancellationToken);
+        if (!string.IsNullOrWhiteSpace(query.Email))
+        {
+            peopleSummary = peopleSummary.Where(p =>
+                p.Email.Contains(query.Email));
+        }
+        
+        
 
            // -------------------------
            // Sorting
@@ -83,6 +106,14 @@ public class PersonRepository(DvldContext dvldContext) : IPersonRepository
                    query.IsDescending
                        ? peopleSummary.OrderByDescending(p => p.NationalId)
                        : peopleSummary.OrderBy(p => p.NationalId),
+               
+               "phone" => query.IsDescending
+                   ? peopleSummary.OrderByDescending(p => p.Phone)
+                   : peopleSummary.OrderBy(p => p.Phone),
+               
+               "email" => query.IsDescending
+                   ? peopleSummary.OrderByDescending(p => p.Email)
+                   : peopleSummary.OrderBy(p => p.Email),
 
                _ => peopleSummary.OrderBy(p => p.FullName)
            };
@@ -95,17 +126,19 @@ public class PersonRepository(DvldContext dvldContext) : IPersonRepository
                .Skip((query.PageNumber - 1) * query.PageSize)
                .Take(query.PageSize)
                .ToListAsync(cancellationToken);
+        
 
            return new PagedList<PersonSummary>(
                items,
-               totalCount,
+               items.Count,
                query.PageNumber,
                query.PageSize);
     }
 
     public async Task<PersonSummary?> GetSummaryByIdAsync(Guid personId,CancellationToken cancellationToken)
     {
-        var personSummary = await _dvldContext.PeopleSummaries.FindAsync(personId, cancellationToken);
+        var personSummary = await _dvldContext.PeopleSummaries
+            .FirstOrDefaultAsync(p=>p.PersonId == personId, cancellationToken);
         return personSummary;
     }
 
