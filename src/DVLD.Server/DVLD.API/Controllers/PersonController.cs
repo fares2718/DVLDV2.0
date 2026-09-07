@@ -8,18 +8,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DVLD.API.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class PersonController : ControllerBase
+    public class PersonController(ISender sender) : BaseController(sender)
     {
-        private readonly ISender _sender;
-
-        public PersonController(ISender sender)
-        {
-            _sender = sender;
-        }
-
-        [HttpPatch("activate-person/{personId}")]
+        [HttpPatch("activate-person/{personId:guid}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -60,7 +51,7 @@ namespace DVLD.API.Controllers
             return StatusCode(StatusCodes.Status201Created,cmd);
         }
 
-        [HttpPatch("deactivate-person/{personId}")]
+        [HttpPatch("deactivate-person/{personId:guid}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -80,7 +71,7 @@ namespace DVLD.API.Controllers
             return Ok("Person has been deactivated successfully");
         }
 
-        [HttpGet("get-person/{personId}")]
+        [HttpGet("get-person/{personId:guid}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
