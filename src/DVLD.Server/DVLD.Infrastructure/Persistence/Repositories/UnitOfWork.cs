@@ -1,14 +1,9 @@
 using DVLD.Application.Abstractions.Persistence;
-using DVLD.Infrastructure.Persistence.Context;
 
 namespace DVLD.Infrastructure.Persistence.Repositories;
 
-public class UnitOfWork : IUnitOfWork
+public class UnitOfWork(IPersonRepository personRepository, IAddressRepository addressRepository) : IUnitOfWork
 {
-    public IPersonRepository PersonRepository { get; }
-
-    public UnitOfWork(IPersonRepository personRepository)
-    {
-        PersonRepository = personRepository;
-    }
+    public IPersonRepository PersonRepository { get; } = personRepository;
+    public IAddressRepository AddressRepository { get;  } = addressRepository;
 }

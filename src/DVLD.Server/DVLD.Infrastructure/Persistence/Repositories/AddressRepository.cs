@@ -13,6 +13,9 @@ public class AddressRepository(DvldContext dvldContext) : IAddressRepository
 
     public async Task AddAsync(Address address, CancellationToken cancellationToken = default)
     {
+        if(!await _dvldContext.People.AnyAsync(p => p.PersonId == address.PersonId, cancellationToken))
+            throw new DomainException($"Person with PersonID : '{address.PersonId}' was not found");
+        
         if (address.IsPrimary && await PersonHasPrimaryAddress(address.PersonId, cancellationToken))
             throw new DomainException("Person can has only one primary address.");
         
