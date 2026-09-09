@@ -18,7 +18,7 @@ public class AddressController(ISender sender) : BaseController(sender)
     public async Task<IActionResult> AddAddress([FromBody] AddAddressCommand cmd,
         CancellationToken cancellationToken = default)
     {
-        var result = await _sender.Send(cmd, cancellationToken);
+        var result = await Sender.Send(cmd, cancellationToken);
 
         return result.MatchFirst<IActionResult>(
             success => Ok(success),
@@ -46,7 +46,7 @@ public class AddressController(ISender sender) : BaseController(sender)
     public async Task<IActionResult> AddAddresses([FromBody] AddAddressesCommand cmd,
         CancellationToken cancellationToken = default)
     {
-        var result = await _sender.Send(cmd, cancellationToken);
+        var result = await Sender.Send(cmd, cancellationToken);
 
         return result.MatchFirst<IActionResult>(
             success => Ok(success),
@@ -82,7 +82,7 @@ public class AddressController(ISender sender) : BaseController(sender)
             request.IsActive
             );
 
-        var result = await _sender.Send(query,cancellationToken);
+        var result = await Sender.Send(query,cancellationToken);
 
         return result.MatchFirst(
             success => Ok(success),
@@ -113,7 +113,7 @@ public class AddressController(ISender sender) : BaseController(sender)
         ChangeAddressActivationStatusRequest request, CancellationToken cancellationToken = default)
     {
         var cmd = new ChangeAddressActivationStatusCommand(addressId, request.IsActive);
-        var result = await _sender.Send(cmd, cancellationToken);
+        var result = await Sender.Send(cmd, cancellationToken);
         
         return result.MatchFirst(
             success => Ok(success),
@@ -143,7 +143,7 @@ public class AddressController(ISender sender) : BaseController(sender)
         ChangeAddressPrimaryStatusRequest request, CancellationToken cancellationToken = default)
     {
         var cmd = new ChangeAddressPrimaryStatusCommand(addressId, request.IsPrimary);
-        var result = await _sender.Send(cmd, cancellationToken);
+        var result = await Sender.Send(cmd, cancellationToken);
         
         return result.MatchFirst(
             success => Ok(success),
@@ -177,7 +177,7 @@ public class AddressController(ISender sender) : BaseController(sender)
             , request.City, request.Governorate, request.Street, request.BuildingNumber, request.ApartmentNumber,
             request.PostalCode, request.AdditionalDetails);
 
-        var result = await _sender.Send(cmd, cancellationToken);
+        var result = await Sender.Send(cmd, cancellationToken);
 
         return result.MatchFirst(
             success => Ok(success),

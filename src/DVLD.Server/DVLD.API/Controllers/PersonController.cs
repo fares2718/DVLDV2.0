@@ -2,7 +2,8 @@ using DVLD.Application.Features.People.Activation;
 using DVLD.Application.Features.People.Create;
 using DVLD.Application.Features.People.Get;
 using DVLD.Application.Features.People.Update;
-using ErrorOr;
+using DVLD.Contract.Person.Requests;
+using DVLD.Contract.Person.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,18 +16,13 @@ namespace DVLD.API.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
 
-        public async Task<IActionResult> Activate(Guid personId, CancellationToken cancellationToken)
+        public async Task<IActionResult> Activate(Guid personId, CancellationToken cancellationToken = default)
         {
             var cmd = new ActivatePersonCommand(personId);
-            var result = await _sender.Send(cmd, cancellationToken);
-            
-            if(result.IsError)
-                return result.FirstError.Type switch
-                {
-                    ErrorType.Validation => BadRequest(result.Errors),
-                    ErrorType.NotFound =>  NotFound(result.Errors),
-                    _ => Problem(statusCode:StatusCodes.Status500InternalServerError,detail:result.FirstError.Description)
-                };
+            var result = await Sender.Send(cmd, cancellationToken);
+
+            if (result.IsError)
+                return HandleErrors(result.Errors);
             return Ok("Person has been activated successfully");
         }
 
@@ -35,20 +31,26 @@ namespace DVLD.API.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
 
-        public async Task<IActionResult> Create([FromBody]CreatePersonCommand cmd,CancellationToken cancellationToken)
+        public async Task<IActionResult> Create([FromBody]CreatePersonRequest request,CancellationToken cancellationToken = default)
         {
-            var result = await _sender.Send(cmd, cancellationToken);
+            var cmd = new CreatePersonCommand(
+                request.NationalId,
+                request.FirstName, request.SecondName,request.ThirdName,request.LastName,
+                request.MotherName,
+                request.DateOfBirth,request.Phone,request.Gender,request.Email,request.NationalityCountryCode,
+                request.ImagePath,request.AltPhone
+                );
+            var result = await Sender.Send(cmd, cancellationToken);
 
             if (result.IsError)
-            {
-                return result.FirstError.Type switch
-                {
-                    ErrorType.Validation => BadRequest(result.Errors),
-                    _ => Problem(statusCode:StatusCodes.Status500InternalServerError,detail:result.FirstError.Description)
-                };
-            }
+                return HandleErrors(result.Errors);
 
-            return StatusCode(StatusCodes.Status201Created,cmd);
+            var response = new CreatePersonResponse(result.Value, "Person has been created successfully.");
+
+            return CreatedAtRoute("get-person",new
+            {
+                personId = result.Value
+            },response);
         }
 
         [HttpPatch("deactivate-person/{personId:guid}")]
@@ -56,37 +58,27 @@ namespace DVLD.API.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
 
-        public async Task<IActionResult> DeActivate(Guid personId, CancellationToken cancellationToken)
+        public async Task<IActionResult> DeActivate(Guid personId, CancellationToken cancellationToken = default)
         {
             var cmd = new DeActivatePersonCommand(personId);
-            var result = await _sender.Send(cmd, cancellationToken);
-            
-            if(result.IsError)
-                return result.FirstError.Type switch
-                {
-                    ErrorType.Validation => BadRequest(result.Errors),
-                    ErrorType.NotFound =>  NotFound(result.Errors),
-                    _ => Problem(statusCode:StatusCodes.Status500InternalServerError,detail:result.FirstError.Description)
-                };
+            var result = await Sender.Send(cmd, cancellationToken);
+
+            if (result.IsError)
+                return HandleErrors(result.Errors);
             return Ok("Person has been deactivated successfully");
         }
 
-        [HttpGet("get-person/{personId:guid}")]
+        [HttpGet("get-person/{personId:guid}", Name = "get-person")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
 
-        public async Task<IActionResult> GetById(Guid personId, CancellationToken cancellationToken)
+        public async Task<IActionResult> GetById(Guid personId, CancellationToken cancellationToken = default)
         {
             var query = new GetPersonByIdQuery(personId);
-            var result = await _sender.Send(query, cancellationToken);
-            if(result.IsError)
-                return result.FirstError.Type switch
-                {
-                    ErrorType.Validation => BadRequest(result.Errors),
-                    ErrorType.NotFound =>  NotFound(result.Errors),
-                    _ => Problem(statusCode:StatusCodes.Status500InternalServerError,detail:result.FirstError.Description)
-                };
+            var result = await Sender.Send(query, cancellationToken);
+            if (result.IsError)
+                return HandleErrors(result.Errors);
             return Ok(result.Value);   
         }
 
@@ -95,71 +87,85 @@ namespace DVLD.API.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
 
-        public async Task<IActionResult> GetAllSummary([FromQuery]GetPeopleQuery query,CancellationToken cancellationToken)
+        public async Task<IActionResult> GetAllSummary([FromQuery]GetPeopleRequest request,CancellationToken cancellationToken = default)
         {
-            var result = await _sender.Send(query, cancellationToken);
-            if(result.IsError)
-                return result.FirstError.Type switch
-                {
-                    ErrorType.Validation => BadRequest(result.Errors),
-                    ErrorType.NotFound =>  NotFound(result.Errors),
-                    _ => Problem(statusCode:StatusCodes.Status500InternalServerError,detail:result.FirstError.Description)
-                };
+            var query = new GetPeopleQuery(
+                request.Search,
+                request.NationalId,
+                request.Name,
+                request.Gender,
+                request.Phone,
+                request.Email,
+                request.SortBy,
+                request.IsDescending,
+                request.IsActive,
+                request.PageNumber,
+                request.PageSize
+                );
+            var result = await Sender.Send(query, cancellationToken);
+            if (result.IsError)
+                return HandleErrors(result.Errors);
             return Ok(result.Value);
         }
 
-        [HttpPatch("update-person-name")]
+        [HttpPatch("update-person-name/{personId:guid}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
 
-        public async Task<IActionResult> UpdateName([FromBody] UpdatePersonNameCommand cmd,
-            CancellationToken cancellationToken)
+        public async Task<IActionResult> UpdateName(Guid personId ,
+            [FromBody] UpdatePersonNameRequest request,
+            CancellationToken cancellationToken = default)
         {
-            var result = await _sender.Send(cmd, cancellationToken);
-            if(result.IsError)
-                return result.FirstError.Type switch
-                {
-                    ErrorType.Validation => BadRequest(result.Errors),
-                    ErrorType.NotFound =>  NotFound(result.Errors),
-                    _ => Problem(statusCode:StatusCodes.Status500InternalServerError,detail:result.FirstError.Description)
-                };
+            var cmd = new UpdatePersonNameCommand(
+                personId,
+                request.FirstName,
+                request.SecondName,
+                request.ThirdName,
+                request.LastName,
+                request.MotherName
+                );
+            var result = await Sender.Send(cmd, cancellationToken);
+            if (result.IsError)
+                return HandleErrors(result.Errors);
             return Ok("Person name has been updated successfully");
         }
         
-        [HttpPatch("update-person-contact-info")]
+        [HttpPatch("update-person-contact-info/{personId:guid}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         
-        public async Task<IActionResult> UpdateContactInfo([FromBody] UpdatePersonContactInfoCommand cmd,CancellationToken cancellationToken)
+        public async Task<IActionResult> UpdateContactInfo(Guid personId,
+            [FromBody] UpdatePersonContactInfoRequest request,CancellationToken cancellationToken = default)
         {
-            var result = await _sender.Send(cmd, cancellationToken);
+            var cmd = new UpdatePersonContactInfoCommand(
+                personId,
+                request.Phone,
+                request.AltPhone
+                );
+            var result = await Sender.Send(cmd, cancellationToken);
             if(result.IsError)
-                return result.FirstError.Type switch
-                {
-                    ErrorType.Validation => BadRequest(result.Errors),
-                    ErrorType.NotFound =>  NotFound(result.Errors),
-                    _ => Problem(statusCode:StatusCodes.Status500InternalServerError,detail:result.FirstError.Description)
-                };
+                return HandleErrors(result.Errors);
             return Ok("Person contact info has been updated successfully");
         }
         
-        [HttpPatch("update-personal-info")]
+        [HttpPatch("update-personal-info/{personId:guid}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         
-        public async Task<IActionResult> UpdatePersonalInfo([FromBody] UpdatePersonalInfoCommand cmd,CancellationToken cancellationToken)
+        public async Task<IActionResult> UpdatePersonalInfo(Guid personId,
+            [FromBody] UpdatePersonalInfoRequest request,CancellationToken cancellationToken = default)
         {
-            var result = await _sender.Send(cmd, cancellationToken);
-            if(result.IsError)
-                return result.FirstError.Type switch
-                {
-                    ErrorType.Validation => BadRequest(result.Errors),
-                    ErrorType.NotFound =>  NotFound(result.Errors),
-                    _ => Problem(statusCode:StatusCodes.Status500InternalServerError,detail:result.FirstError.Description)
-                };
+            var cmd = new UpdatePersonalInfoCommand(
+                personId,
+                request.DateOfBirth,
+                request.NationalityCountryCode
+                );
+            var result = await Sender.Send(cmd, cancellationToken);
+            if (result.IsError)
+                return HandleErrors(result.Errors);
             return Ok("Personal info has been updated successfully");
         }
         

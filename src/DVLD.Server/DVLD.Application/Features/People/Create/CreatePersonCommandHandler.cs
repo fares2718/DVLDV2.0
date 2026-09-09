@@ -6,21 +6,12 @@ using MediatR;
 
 namespace DVLD.Application.Features.People.Create;
 
-public class CreatePersonCommandHandler
-    : IRequestHandler<CreatePersonCommand, ErrorOr<Created>>
+public class CreatePersonCommandHandler(IUnitOfWork uow, CreatePersonCommandValidator validator)
+    : IRequestHandler<CreatePersonCommand, ErrorOr<Guid>>
 {
-    private readonly IUnitOfWork _uow;
-    private readonly CreatePersonCommandValidator _validator;
-
-    public CreatePersonCommandHandler(IUnitOfWork uow, CreatePersonCommandValidator validator)
+    public async Task<ErrorOr<Guid>> Handle(CreatePersonCommand request, CancellationToken cancellationToken)
     {
-        _uow = uow;
-        _validator = validator;
-    }
-
-    public async Task<ErrorOr<Created>> Handle(CreatePersonCommand request, CancellationToken cancellationToken)
-    {
-        var validateResult = await _validator.ValidateAsync(request, cancellationToken);
+        var validateResult = await validator.ValidateAsync(request, cancellationToken);
         if (!validateResult.IsValid)
             return Error.Validation(validateResult.Errors.First().ErrorMessage);
 
@@ -31,8 +22,8 @@ public class CreatePersonCommandHandler
         
         try
         {
-            await _uow.PersonRepository.AddAsync(person, cancellationToken);
-            return Result.Created;
+            var newId = await uow.PersonRepository.AddAsync(person, cancellationToken);
+            return newId;
         }
         catch (DomainException e)
         {

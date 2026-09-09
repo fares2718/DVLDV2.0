@@ -1,9 +1,6 @@
-using ErrorOr;
-using MediatR;
+namespace DVLD.Contract.Person.Requests;
 
-namespace DVLD.Application.Features.People.Create;
-
-public sealed record CreatePersonCommand(
+public sealed record CreatePersonRequest(
     string NationalId,
     string FirstName,
     string SecondName,
@@ -16,4 +13,5 @@ public sealed record CreatePersonCommand(
     string Email,
     string NationalityCountryCode,
     string? ImagePath = null,
-    string? AltPhone = null) : IRequest<ErrorOr<Guid>>;
+    string? AltPhone = null
+);

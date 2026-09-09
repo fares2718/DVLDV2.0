@@ -23,15 +23,18 @@ public class PersonRepository(DvldContext dvldContext) : IPersonRepository
         await _dvldContext.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task AddAsync(Person person,CancellationToken cancellationToken)
+    public async Task<Guid> AddAsync(Person person,CancellationToken cancellationToken)
     {
-        if (await IsNationalIdUnique(person.NationalId))
+        bool uniqueNationalId = await IsNationalIdUnique(person.NationalId);
+        if (!uniqueNationalId)
             throw new DomainException("National ID already exists.");
-        if(await IsEmailUnique(person.Email))
+        bool uniqueEmail = await IsEmailUnique(person.Email);
+        if(!uniqueEmail)
             throw new DomainException("Email already exists.");
         
         _dvldContext.Add(person);
         await _dvldContext.SaveChangesAsync(cancellationToken);
+        return person.PersonId;
     }
 
     public async Task DeActivateAsync(Guid personId, CancellationToken cancellationToken)

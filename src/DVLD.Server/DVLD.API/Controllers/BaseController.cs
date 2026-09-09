@@ -1,3 +1,4 @@
+using ErrorOr;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -5,12 +6,34 @@ namespace DVLD.API.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class BaseController : ControllerBase
+public class BaseController(ISender sender) : ControllerBase
 {
-    protected readonly ISender _sender;
+    protected readonly ISender Sender = sender;
 
-    public BaseController(ISender sender)
+    protected IActionResult HandleErrors(List<Error> errors)
     {
-        _sender = sender;
+        if (errors.Count == 0)
+            return Problem(
+                statusCode: StatusCodes.Status500InternalServerError
+            );
+
+        var firstError = errors[0];
+
+        return firstError.Type switch
+        {
+            ErrorType.Validation => BadRequest(errors),
+
+            ErrorType.NotFound => NotFound(errors),
+
+            ErrorType.Conflict => Conflict(errors),
+
+            ErrorType.Unauthorized => Unauthorized(),
+
+            ErrorType.Forbidden => Forbid(),
+
+            _ => Problem(
+                statusCode: StatusCodes.Status500InternalServerError,
+                detail: firstError.Description)
+        };
     }
 }
