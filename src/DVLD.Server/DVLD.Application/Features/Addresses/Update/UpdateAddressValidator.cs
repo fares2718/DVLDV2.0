@@ -1,16 +1,15 @@
 using FluentValidation;
 
-namespace DVLD.Application.Features.Addresses.Add;
+namespace DVLD.Application.Features.Addresses.Update;
 
-public sealed class AddAddressValidator 
-    : AbstractValidator<AddAddressCommand>
+public sealed class UpdateAddressValidator : AbstractValidator<UpdateAddressCommand>
 {
-    public AddAddressValidator()
+    public UpdateAddressValidator()
     {
-        RuleFor(x => x.PersonId)
+        RuleFor(x => x.AddressId)
             .NotEmpty()
-            .WithMessage("Person ID is required.");
-
+            .WithMessage("Address ID required");
+        
         RuleFor(x => x.AddressType)
             .Must(at => at is 1 or 2)
             .WithMessage("Invalid address type, Address type must be 1.Home or 2.Work.");
@@ -26,7 +25,7 @@ public sealed class AddAddressValidator
             .WithMessage("City is required.")
             .MaximumLength(100)
             .WithMessage("City must not exceed 100 characters.");
-
+        
         RuleFor(x => x.Governorate)
             .MaximumLength(100)
             .When(x => !string.IsNullOrWhiteSpace(x.Governorate))

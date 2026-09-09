@@ -1,6 +1,7 @@
 using DVLD.Application.Features.Addresses.Add;
 using DVLD.Application.Features.Addresses.Get;
 using DVLD.Application.Features.Addresses.Status;
+using DVLD.Application.Features.Addresses.Update;
 using DVLD.Contract.Address;
 using ErrorOr;
 using MediatR;
@@ -161,5 +162,38 @@ public class AddressController(ISender sender) : BaseController(sender)
                 _ => Problem(title: error.Code, detail: error.Description)
             }
         );
+    }
+
+    [HttpPut("update-address/{addressId:guid}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+
+    public async Task<IActionResult> UpdateAddress(Guid addressId, [FromBody] UpdateAddressRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var cmd = new UpdateAddressCommand(addressId, request.AddressType, request.CountryCode
+            , request.City, request.Governorate, request.Street, request.BuildingNumber, request.ApartmentNumber,
+            request.PostalCode, request.AdditionalDetails);
+
+        var result = await _sender.Send(cmd, cancellationToken);
+
+        return result.MatchFirst(
+            success => Ok(success),
+            error => error.Type switch
+            {
+                ErrorType.NotFound => NotFound(new
+                {
+                    code = error.Code,
+                    description = error.Description
+                }),
+                ErrorType.Validation => BadRequest(new
+                {
+                    code = error.Code,
+                    description = error.Description
+                }),
+                _ => Problem(title: error.Code, detail: error.Description)
+            });
     }
 }
