@@ -2,8 +2,7 @@ using DVLD.Application.Features.Addresses.Add;
 using DVLD.Application.Features.Addresses.Get;
 using DVLD.Application.Features.Addresses.Status;
 using DVLD.Application.Features.Addresses.Update;
-using DVLD.Contract.Address;
-using ErrorOr;
+using DVLD.Contract.Address.Requests;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,62 +11,51 @@ namespace DVLD.API.Controllers;
 public class AddressController(ISender sender) : BaseController(sender)
 {
     [HttpPost("add-address")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
 
-    public async Task<IActionResult> AddAddress([FromBody] AddAddressCommand cmd,
+    public async Task<IActionResult> AddAddress([FromBody] AddAddressRequest request,
         CancellationToken cancellationToken = default)
     {
+        var cmd = new AddAddressCommand(request.PersonId,request.AddressType,request.CountryCode,
+            request.City,request.Governorate,request.Street,request.BuildingNumber,request.ApartmentNumber,
+            request.PostalCode,request.AdditionalDetails);
+        
         var result = await Sender.Send(cmd, cancellationToken);
 
-        return result.MatchFirst<IActionResult>(
-            success => Ok(success),
-            error => error.Type switch
-            {
-                ErrorType.NotFound => NotFound(new
-                {
-                    code = error.Code,
-                    description = error.Description
-                }),
-                ErrorType.Validation => BadRequest(new
-                {
-                    code = error.Code,
-                    description = error.Description
-                }),
-                _ => Problem(title: error.Code, detail: error.Description)
-            }
-        );
+        if (result.IsError)
+            return HandleErrors(result.Errors);
+        return CreatedAtRoute("get-person-addresses",new
+        {
+            personId = request.PersonId
+        },result.Value);
     }
     
     [HttpPost("add-addresses")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
 
-    public async Task<IActionResult> AddAddresses([FromBody] AddAddressesCommand cmd,
+    public async Task<IActionResult> AddAddresses([FromBody] AddAddressesRequest request,
         CancellationToken cancellationToken = default)
     {
+        var cmd = new AddAddressesCommand(request.Addresses.Select(
+            a => new AddAddressCommand(a.PersonId,a.AddressType,a.CountryCode,
+                a.City,a.Governorate,a.Street,a.BuildingNumber,a.ApartmentNumber,
+                a.PostalCode,a.AdditionalDetails)
+            )
+        );
         var result = await Sender.Send(cmd, cancellationToken);
 
-        return result.MatchFirst<IActionResult>(
-            success => Ok(success),
-            error => error.Type switch
-            {
-                ErrorType.NotFound => NotFound(new
-                {
-                    code = error.Code,
-                    description = error.Description
-                }),
-                ErrorType.Validation => BadRequest(new
-                {
-                    code = error.Code,
-                    description = error.Description
-                }),
-                _ => Problem(title:error.Code,detail:error.Description)
-            }
-        );
+        if (result.IsError)
+            return HandleErrors(result.Errors);
+        
+        return CreatedAtRoute("get-person-addresses",new
+        {
+            personId = request.Addresses.First().PersonId
+        },result.Value);
     }
 
-    [HttpGet("get-person-addresses/{personId:guid}")]
+    [HttpGet("get-person-addresses/{personId:guid}",Name = "get-person-addresses")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -84,23 +72,10 @@ public class AddressController(ISender sender) : BaseController(sender)
 
         var result = await Sender.Send(query,cancellationToken);
 
-        return result.MatchFirst(
-            success => Ok(success),
-            error => error.Type switch
-            {
-                ErrorType.NotFound => NotFound(new
-                {
-                    code = error.Code,
-                    description = error.Description
-                }),
-                ErrorType.Validation => BadRequest(new
-                {
-                    code = error.Code,
-                    description = error.Description
-                }),
-                _ => Problem(title: error.Code, detail: error.Description)
-            }
-        );
+        if (result.IsError)
+            return HandleErrors(result.Errors);
+        
+        return Ok(result.Value);
 
     }
 
@@ -114,24 +89,10 @@ public class AddressController(ISender sender) : BaseController(sender)
     {
         var cmd = new ChangeAddressActivationStatusCommand(addressId, request.IsActive);
         var result = await Sender.Send(cmd, cancellationToken);
-        
-        return result.MatchFirst(
-            success => Ok(success),
-            error => error.Type switch
-            {
-                ErrorType.NotFound => NotFound(new
-                {
-                    code = error.Code,
-                    description = error.Description
-                }),
-                ErrorType.Validation => BadRequest(new
-                {
-                    code = error.Code,
-                    description = error.Description
-                }),
-                _ => Problem(title: error.Code, detail: error.Description)
-            }
-        );
+
+        if (result.IsError)
+            return HandleErrors(result.Errors);
+        return Ok("Address activation status has been changed successfully");
     }
     
     [HttpPatch("change-address-primary-status/{addressId:guid}")]
@@ -145,23 +106,9 @@ public class AddressController(ISender sender) : BaseController(sender)
         var cmd = new ChangeAddressPrimaryStatusCommand(addressId, request.IsPrimary);
         var result = await Sender.Send(cmd, cancellationToken);
         
-        return result.MatchFirst(
-            success => Ok(success),
-            error => error.Type switch
-            {
-                ErrorType.NotFound => NotFound(new
-                {
-                    code = error.Code,
-                    description = error.Description
-                }),
-                ErrorType.Validation => BadRequest(new
-                {
-                    code = error.Code,
-                    description = error.Description
-                }),
-                _ => Problem(title: error.Code, detail: error.Description)
-            }
-        );
+        if (result.IsError)
+            return HandleErrors(result.Errors);
+        return Ok("Address primary status has been changed successfully");
     }
 
     [HttpPut("update-address/{addressId:guid}")]
@@ -179,21 +126,8 @@ public class AddressController(ISender sender) : BaseController(sender)
 
         var result = await Sender.Send(cmd, cancellationToken);
 
-        return result.MatchFirst(
-            success => Ok(success),
-            error => error.Type switch
-            {
-                ErrorType.NotFound => NotFound(new
-                {
-                    code = error.Code,
-                    description = error.Description
-                }),
-                ErrorType.Validation => BadRequest(new
-                {
-                    code = error.Code,
-                    description = error.Description
-                }),
-                _ => Problem(title: error.Code, detail: error.Description)
-            });
+        if (result.IsError)
+            return HandleErrors(result.Errors);
+        return Ok("Address has been updated successfully");
     }
 }

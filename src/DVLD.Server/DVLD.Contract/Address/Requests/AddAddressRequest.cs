@@ -1,6 +1,7 @@
-namespace DVLD.Contract.Address;
+namespace DVLD.Contract.Address.Requests;
 
-public sealed record UpdateAddressRequest(
+public sealed record AddAddressRequest(
+    Guid PersonId,
     byte AddressType,
     string CountryCode,
     string City,

@@ -1,4 +1,4 @@
-namespace DVLD.Contract.Address;
+namespace DVLD.Contract.Address.Requests;
 
 public record GetPersonAddressesRequest(
     bool? IsPrimary,
