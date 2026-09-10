@@ -8,9 +8,8 @@
 1. Confirm the hierarchical license class model (PrivilegeLevel vs Explicit Inclusion).
 2. Finalise the list of Application Statuses.
 3. Define exact Practical test fees per class.
-4. Decide technology stack.
-5. Produce first version of database schema.
-6. Set up repository, CI, coding standards, and project structure.
+4. Produce first version of database schema.
+5. Set up repository, CI, coding standards, and project structure.
 
 ## Key Decisions to Close
 
@@ -24,12 +23,12 @@
 
 ## Deliverables
 
-- [ ] Signed-off `license-system.md`
-- [ ] Final `business-rules.md` (no major open questions left)
-- [ ] Database schema diagram + SQL scripts (v0.1)
-- [ ] Technology Decision Record (ADR)
-- [ ] Empty solution with Clean Architecture folders + basic CI
-- [ ] Sprint 1 ready to start
+- [x] Signed-off `license-system.md`
+- [x] Final `business-rules.md` (no major open questions left)
+- [x] Database schema diagram + SQL scripts (v0.1)
+- [x] Technology Decision Record (ADR)
+- [x] Empty solution with Clean Architecture folders + basic CI
+- [x] Sprint 1 ready to start
 
 ## Exit Criteria
 

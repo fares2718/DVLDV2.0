@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "license-system.md",
+                "file": "sprints/sprint-01.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "license-system"
+              "title": "sprint-01"
             }
           }
         ]
@@ -187,11 +187,11 @@
   },
   "active": "f3f96e0f6d86cb56",
   "lastOpenFiles": [
-    "domain-analysis.md",
     "sprints/sprint-00.md",
+    "license-system.md",
+    "domain-analysis.md",
     "roadmap.md",
     "business-rules.md",
-    "license-system.md",
     "system-analysis.md",
     "README.md"
   ]
