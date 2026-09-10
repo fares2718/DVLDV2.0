@@ -195,6 +195,10 @@ public class Person
                 $"{fieldName} cannot be empty");
     }
 
+    public void SetImagePath(string? imagePath)
+    {
+        ImagePath = imagePath;
+    }
     private static void ValidateDateOfBirth(
         DateOnly dateOfBirth)
     {

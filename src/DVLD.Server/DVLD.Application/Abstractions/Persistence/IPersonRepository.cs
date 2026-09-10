@@ -31,4 +31,6 @@ public interface IPersonRepository
 
     Task UpdatePersonalInfo(Guid personId, DateOnly dateOfBirth,
         string nationalityCountryCode, CancellationToken cancellationToken);
+    
+    Task UploadImageAsync(Guid personId,string imagePath ,CancellationToken cancellationToken = default);
 }

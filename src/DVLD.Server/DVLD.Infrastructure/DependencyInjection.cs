@@ -1,6 +1,8 @@
 using DVLD.Application.Abstractions.Persistence;
+using DVLD.Application.Abstractions.Services;
 using DVLD.Infrastructure.Persistence.Context;
 using DVLD.Infrastructure.Persistence.Repositories;
+using DVLD.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,6 +22,7 @@ public static class DependencyInjection
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IPersonRepository, PersonRepository>();
         services.AddScoped<IAddressRepository, AddressRepository>();
+        services.AddScoped<IImageService, ImageService>();
 
         return services;
     }

@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DVLD.Infrastructure.Persistence.Repositories;
 
-public class AddressRepository(DvldContext dvldContext) : IAddressRepository
+internal class AddressRepository(DvldContext dvldContext) : IAddressRepository
 {
     private readonly DvldContext _dvldContext = dvldContext;
 

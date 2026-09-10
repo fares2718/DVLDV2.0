@@ -38,7 +38,7 @@ namespace DVLD.API.Controllers
                 request.FirstName, request.SecondName,request.ThirdName,request.LastName,
                 request.MotherName,
                 request.DateOfBirth,request.Phone,request.Gender,request.Email,request.NationalityCountryCode,
-                request.ImagePath,request.AltPhone
+                request.FileName,request.Image,request.AltPhone
                 );
             var result = await Sender.Send(cmd, cancellationToken);
 
@@ -167,6 +167,21 @@ namespace DVLD.API.Controllers
             if (result.IsError)
                 return HandleErrors(result.Errors);
             return Ok("Personal info has been updated successfully");
+        }
+        
+        [HttpPatch("upload-image/{personId:guid}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        
+        public async Task<IActionResult> UpLoadImage(Guid personId,
+            [FromForm] UploadImageRequest request,CancellationToken cancellationToken = default)
+        {
+            var cmd = new UploadImageCommand(personId, request.Image, request.FileName);
+            var result = await Sender.Send(cmd, cancellationToken);
+            if (result.IsError)
+                return HandleErrors(result.Errors);
+            return Ok("Image has been uploaded successfully");
         }
         
     }

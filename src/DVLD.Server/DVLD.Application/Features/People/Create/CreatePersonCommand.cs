@@ -1,5 +1,6 @@
 using ErrorOr;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 
 namespace DVLD.Application.Features.People.Create;
 
@@ -15,5 +16,6 @@ public sealed record CreatePersonCommand(
     bool Gender,
     string Email,
     string NationalityCountryCode,
-    string? ImagePath = null,
+    string? FileName = null,
+    IFormFile?  Image = null,
     string? AltPhone = null) : IRequest<ErrorOr<Guid>>;

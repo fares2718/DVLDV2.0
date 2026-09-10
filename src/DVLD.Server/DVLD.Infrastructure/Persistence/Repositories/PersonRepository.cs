@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DVLD.Infrastructure.Persistence.Repositories;
 
-public class PersonRepository(DvldContext dvldContext) : IPersonRepository
+internal class PersonRepository(DvldContext dvldContext) : IPersonRepository
 {
     private readonly DvldContext _dvldContext = dvldContext;
 
@@ -187,6 +187,16 @@ public class PersonRepository(DvldContext dvldContext) : IPersonRepository
         if (person is null)
             throw new KeyNotFoundException($"Person with ID {personId} was not found.");
         person.UpdatePersonalInfo(dateOfBirth, nationalityCountryCode);
+        await _dvldContext.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task UploadImageAsync(Guid personId, string imagePath, CancellationToken cancellationToken = default)
+    {
+        var person = await GetPersonById(personId, cancellationToken);
+        if (person is null)
+            throw new KeyNotFoundException($"Person with ID {personId} was not found.");
+        
+        person.SetImagePath(imagePath);
         await _dvldContext.SaveChangesAsync(cancellationToken);
     }
 }

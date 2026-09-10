@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Http;
+
 namespace DVLD.Contract.Person.Requests;
 
 public sealed record CreatePersonRequest(
@@ -12,6 +14,7 @@ public sealed record CreatePersonRequest(
     bool Gender,
     string Email,
     string NationalityCountryCode,
-    string? ImagePath = null,
+    string? FileName = null,
+    IFormFile? Image = null,
     string? AltPhone = null
 );
