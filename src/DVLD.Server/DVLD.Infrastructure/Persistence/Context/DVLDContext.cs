@@ -45,6 +45,12 @@ public partial class DvldContext(DbContextOptions<DvldContext> options) : DbCont
     public virtual DbSet<UserRole> UserRoles { get; set; }
     
     public virtual DbSet<PersonSummary> PeopleSummaries { get; set; }
+    
+    public virtual DbSet<UserRefreshToken> UserRefreshTokens { get; set; }
+    
+    public virtual DbSet<UserView> UsersViews { get; set; }
+    
+    public virtual DbSet<UserDetailsView> UserDetailsViews { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
