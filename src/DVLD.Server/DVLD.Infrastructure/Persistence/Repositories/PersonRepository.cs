@@ -23,7 +23,7 @@ internal class PersonRepository(DvldContext dvldContext) : IPersonRepository
         await _dvldContext.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<Guid> AddAsync(Person person,CancellationToken cancellationToken)
+    public async Task AddAsync(Person person,CancellationToken cancellationToken)
     {
         bool uniqueNationalId = await IsNationalIdUnique(person.NationalId);
         if (!uniqueNationalId)
@@ -33,8 +33,6 @@ internal class PersonRepository(DvldContext dvldContext) : IPersonRepository
             throw new DomainException("Email already exists.");
         
         _dvldContext.Add(person);
-        await _dvldContext.SaveChangesAsync(cancellationToken);
-        return person.PersonId;
     }
 
     public async Task DeActivateAsync(Guid personId, CancellationToken cancellationToken)
@@ -43,7 +41,6 @@ internal class PersonRepository(DvldContext dvldContext) : IPersonRepository
         if (person == null)
             throw new KeyNotFoundException($"Person with ID {personId} was not found.");
         person.Deactivate();
-        await _dvldContext.SaveChangesAsync(cancellationToken);
     }
     
     public async Task<PagedList<PersonSummary>> GetPeopleSummaryAsync( GetPeopleQuery query,
@@ -168,7 +165,7 @@ internal class PersonRepository(DvldContext dvldContext) : IPersonRepository
         if (person is null)
             throw new KeyNotFoundException($"Person with ID {personId} was not found.");
         person.UpdateName(firstName, secondName, thirdName, lastName, motherName);
-        await _dvldContext.SaveChangesAsync(cancellationToken);
+        
     }
 
     public async Task UpdatePersonContactInfo(Guid personId,string phone, string? altPhone,CancellationToken cancellationToken)
@@ -177,7 +174,6 @@ internal class PersonRepository(DvldContext dvldContext) : IPersonRepository
         if (person is null)
             throw new KeyNotFoundException($"Person with ID {personId} was not found.");
         person.UpdateContactInfo(phone, altPhone);
-        await _dvldContext.SaveChangesAsync(cancellationToken);
     }
 
     public async Task UpdatePersonalInfo(Guid personId, DateOnly dateOfBirth, string nationalityCountryCode,
@@ -187,7 +183,6 @@ internal class PersonRepository(DvldContext dvldContext) : IPersonRepository
         if (person is null)
             throw new KeyNotFoundException($"Person with ID {personId} was not found.");
         person.UpdatePersonalInfo(dateOfBirth, nationalityCountryCode);
-        await _dvldContext.SaveChangesAsync(cancellationToken);
     }
 
     public async Task UploadImageAsync(Guid personId, string imagePath, CancellationToken cancellationToken = default)
@@ -197,6 +192,6 @@ internal class PersonRepository(DvldContext dvldContext) : IPersonRepository
             throw new KeyNotFoundException($"Person with ID {personId} was not found.");
         
         person.SetImagePath(imagePath);
-        await _dvldContext.SaveChangesAsync(cancellationToken);
+        
     }
 }

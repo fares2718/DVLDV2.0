@@ -38,6 +38,7 @@ public sealed class AddAddressesCommandHandler(IUnitOfWork uow, AddAddressesVali
         try
         {
             await _uow.AddressRepository.AddRangeAsync(addresses, cancellationToken);
+            await uow.SaveChangesAsync(cancellationToken);
             return Result.Success;
         }
         catch (DomainException e)

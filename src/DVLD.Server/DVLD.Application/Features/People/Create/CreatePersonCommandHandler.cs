@@ -29,8 +29,9 @@ public class CreatePersonCommandHandler(IUnitOfWork uow, CreatePersonCommandVali
         
         try
         {
-            var newId = await uow.PersonRepository.AddAsync(person, cancellationToken);
-            return newId;
+            await uow.PersonRepository.AddAsync(person, cancellationToken);
+            await uow.SaveChangesAsync(cancellationToken);
+            return person.PersonId;
         }
         catch (DomainException e)
         {

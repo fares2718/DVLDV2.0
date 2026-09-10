@@ -18,6 +18,7 @@ public sealed class ChangeAddressPrimaryStatusCommandHandler(IUnitOfWork uow)
         {
             await _uow.AddressRepository.ChangePrimaryStatusAsync(request.AddressId, request.IsPrimary,
                 cancellationToken);
+            await uow.SaveChangesAsync(cancellationToken);
             return Result.Success;
         }
         catch (KeyNotFoundException e)

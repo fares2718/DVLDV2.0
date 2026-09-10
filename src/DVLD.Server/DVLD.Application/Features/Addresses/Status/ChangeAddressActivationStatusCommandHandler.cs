@@ -18,6 +18,7 @@ public sealed class ChangeAddressActivationStatusCommandHandler(IUnitOfWork uow)
         {
             await _uow.AddressRepository.ChangeActivationStatusAsync(request.AddressId, request.IsActive,
                 cancellationToken);
+            await uow.SaveChangesAsync(cancellationToken);
             return Result.Success;
         }
         catch (KeyNotFoundException e)

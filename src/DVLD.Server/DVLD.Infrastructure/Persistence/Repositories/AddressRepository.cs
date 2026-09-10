@@ -20,7 +20,6 @@ internal class AddressRepository(DvldContext dvldContext) : IAddressRepository
             throw new DomainException("Person can has only one primary address.");
         
         _dvldContext.Addresses.Add(address);
-        await _dvldContext.SaveChangesAsync(cancellationToken);
     }
 
     public async Task AddRangeAsync(IEnumerable<Address> addresses, CancellationToken cancellationToken = default)
@@ -29,7 +28,6 @@ internal class AddressRepository(DvldContext dvldContext) : IAddressRepository
         if(enumerable.Any(a => a.IsPrimary) &&  await PersonHasPrimaryAddress(enumerable.First().PersonId, cancellationToken))
             throw new DomainException("Person can has only one primary address.");
         _dvldContext.Addresses.AddRange(enumerable);
-        await _dvldContext.SaveChangesAsync(cancellationToken);
     }
 
     public async Task ChangeActivationStatusAsync(Guid addressId, bool isActive, CancellationToken cancellationToken = default)
@@ -43,7 +41,6 @@ internal class AddressRepository(DvldContext dvldContext) : IAddressRepository
         {
             address.Deactivate();
         }
-        await _dvldContext.SaveChangesAsync(cancellationToken);
     }
 
     public async Task ChangePrimaryStatusAsync(Guid addressId, bool isPrimary, CancellationToken cancellationToken = default)
@@ -59,8 +56,6 @@ internal class AddressRepository(DvldContext dvldContext) : IAddressRepository
         {
             address.SetAsNotPrimary();
         }
-
-        await _dvldContext.SaveChangesAsync(cancellationToken);
     }
 
     public async Task UpdateAsync(Guid addressId, byte addressType, string countryCode, string city, string? governorate, string? street,
@@ -73,7 +68,6 @@ internal class AddressRepository(DvldContext dvldContext) : IAddressRepository
         
         address.Update((AddressType)addressType,countryCode, city, governorate,
             street, buildingNumber, apartmentNumber, postalCode, additionalDetails);
-        await _dvldContext.SaveChangesAsync(cancellationToken);
     }
 
     public async Task<Address?> GetByIdAsync(Guid addressId, CancellationToken cancellationToken = default)

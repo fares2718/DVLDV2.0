@@ -24,7 +24,7 @@ public class UpdateAddressCommandHandler(IUnitOfWork uow, UpdateAddressValidator
             await _uow.AddressRepository.UpdateAsync(request.AddressId, request.AddressType,
                 request.CountryCode, request.City, request.Governorate, request.Street, request.BuildingNumber,
                 request.ApartmentNumber, request.PostalCode, request.AdditionalDetails, cancellationToken);
-
+            await uow.SaveChangesAsync(cancellationToken);
             return Result.Updated;
         }
         catch (DomainException e)

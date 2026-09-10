@@ -25,6 +25,7 @@ public sealed class AddAddressCommandHandler(IUnitOfWork uow, AddAddressValidato
                 request.CountryCode, request.City, request.Governorate, request.Street,
                 request.BuildingNumber, request.ApartmentNumber, request.PostalCode, request.AdditionalDetails);
             await _uow.AddressRepository.AddAsync(address, cancellationToken);
+            await _uow.SaveChangesAsync(cancellationToken);
             return Result.Success;
         }
         catch (DomainException e)

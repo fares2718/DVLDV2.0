@@ -23,6 +23,7 @@ public sealed class UploadImageCommandHandler(IImageService imageService, IUnitO
         {
             string imagePath = await _imageService.UploadImage(request.Image, request.FileName);
             await _uow.PersonRepository.UploadImageAsync(request.PersonId, imagePath, cancellationToken);
+            await uow.SaveChangesAsync(cancellationToken);
             return Result.Success;
         }
         catch (KeyNotFoundException e)
