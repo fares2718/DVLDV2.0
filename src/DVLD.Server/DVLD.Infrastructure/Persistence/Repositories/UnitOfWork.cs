@@ -1,14 +1,17 @@
 using DVLD.Application.Abstractions.Persistence;
+using DVLD.Infrastructure.Persistence.Context;
 
 namespace DVLD.Infrastructure.Persistence.Repositories;
 
-internal class UnitOfWork(IPersonRepository personRepository, IAddressRepository addressRepository, IUnitOfWork uow) : IUnitOfWork
+internal class UnitOfWork(IPersonRepository personRepository, IAddressRepository addressRepository, IUserRepository userRepository, DvldContext dvldContext) : IUnitOfWork
 {
-    private readonly IUnitOfWork _uow = uow;
+    private readonly DvldContext _dvldContext = dvldContext;
     public IPersonRepository PersonRepository { get; } = personRepository;
     public IAddressRepository AddressRepository { get;  } = addressRepository;
+    public IUserRepository UserRepository { get; } = userRepository;
+
     public async Task SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        await  _uow.SaveChangesAsync(cancellationToken);
+        await  _dvldContext.SaveChangesAsync(cancellationToken);
     }
 }

@@ -1,5 +1,6 @@
 using DVLD.Application.DTOs;
-using DVLD.Application.Filters;
+using DVLD.Application.Features.User.AccountStatus;
+using DVLD.Application.Filters.User;
 using DVLD.Domain.Entities;
 using DVLD.Domain.Views;
 
@@ -11,10 +12,8 @@ public interface IUserRepository
     Task AddAsync(User user,CancellationToken cancellationToken = default);
 
     // Roles
-    void AddRole(UserRole role);
-    
-    void AddRoles(IEnumerable<UserRole> userRoles);
-    Task RemoveRoleAsync(Guid userId, int roleId);
+    Task AddRoleAsync(UserRole role,CancellationToken cancellationToken = default);
+    Task RemoveRoleAsync(Guid userId, int roleId,CancellationToken cancellationToken = default);
 
     // Queries
     Task<UserDetailsView?> GetByIdAsync(
@@ -38,6 +37,8 @@ public interface IUserRepository
     Task ChangeUserLockStatusAsync(
         Guid userId,
         bool isLocked,
+        LockDurationType? durationType = null,
+        int? duration = null,
         CancellationToken cancellationToken = default);
     
 }

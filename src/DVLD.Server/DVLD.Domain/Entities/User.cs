@@ -29,6 +29,7 @@ public class User
         string username,
         string passwordHash)
     {
+        UserId = Guid.NewGuid();
         PersonId = personId;
         Username = username;
         PasswordHash = passwordHash;

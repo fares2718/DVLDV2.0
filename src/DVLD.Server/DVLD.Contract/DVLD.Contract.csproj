@@ -18,4 +18,8 @@
       </Reference>
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\DVLD.Application\DVLD.Application.csproj" />
+    </ItemGroup>
+
 </Project>

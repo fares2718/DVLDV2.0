@@ -1,4 +1,4 @@
-namespace DVLD.Application.Filters;
+namespace DVLD.Application.Filters.User;
 
 public sealed record GetUsersFilter(
     string? Search,

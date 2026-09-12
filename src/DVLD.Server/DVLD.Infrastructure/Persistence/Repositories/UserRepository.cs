@@ -1,6 +1,7 @@
 using DVLD.Application.Abstractions.Persistence;
 using DVLD.Application.DTOs;
-using DVLD.Application.Filters;
+using DVLD.Application.Features.User.AccountStatus;
+using DVLD.Application.Filters.User;
 using DVLD.Domain.Common;
 using DVLD.Domain.Entities;
 using DVLD.Domain.Views;
@@ -24,43 +25,74 @@ internal class UserRepository(DvldContext dvldContext) : IUserRepository
         _dvldContext.Users.Add(user);
     }
 
-    public void AddRole(UserRole role)
+    public async Task AddRoleAsync(UserRole role,CancellationToken cancellationToken = default)
     {
+        var result = await _dvldContext.Roles
+            .Where(r => r.RoleId == role.RoleId && r.IsActive)
+            .Select(r => new
+            {
+                RoleExists = true,
+
+                TargetUserExists = _dvldContext.Users
+                    .Any(u => u.UserId == role.UserId),
+
+                AssigningUserExists = _dvldContext.Users
+                    .Any(u => u.UserId == role.AssignedBy),
+                
+                UserHasRole = _dvldContext.UserRoles
+                    .Where(ur => ur.UserId == role.UserId)
+                    .Any(ur => ur.RoleId == role.RoleId),
+            })
+            .AsNoTracking()
+            .FirstOrDefaultAsync(cancellationToken: cancellationToken);
+
+        if (result is null)
+            throw new KeyNotFoundException(
+                $"Active role with ID {role.RoleId} was not found");
+
+        if (!result.TargetUserExists)
+            throw new KeyNotFoundException(
+                $"Target user with ID {role.UserId} was not found");
+
+        if (!result.AssigningUserExists)
+            throw new KeyNotFoundException(
+                $"Assigning user with ID {role.AssignedBy} was not found");
+        
+        if (result.UserHasRole)
+            throw new DomainException($"User with ID {role.UserId} already has role with ID {role.RoleId}");
+
+
         _dvldContext.UserRoles.Add(role);
     }
 
-    public async Task RemoveRoleAsync(Guid userId, int roleId)
+    public async Task RemoveRoleAsync(Guid userId, int roleId,CancellationToken cancellationToken = default)
     {
-        bool hasRole = await UserHasRole(userId, roleId);
-        
-        if(!hasRole)
-            throw new KeyNotFoundException($"User with User ID : {userId} does not has role with ID : {roleId}");
+        var userRole = await _dvldContext.UserRoles.Where(ur => ur.UserId == userId)
+            .SingleOrDefaultAsync(ur => ur.RoleId == roleId, cancellationToken);
 
-        var userRole = UserHasRole(userId, roleId);
+        if (userRole is null)
+            throw new DomainException($"User with ID : {userId} does not have role with ID {roleId}");
         
         _dvldContext.Entry(userRole).State = EntityState.Deleted;
-    }
-
-    public void AddRoles(IEnumerable<UserRole> userRoles)
-    {
-        _dvldContext.UserRoles.AddRange(userRoles);
     }
 
     public async Task<UserDetailsView?> GetByIdAsync(Guid userId, CancellationToken cancellationToken = default)
     {
         return await _dvldContext.UserDetailsViews
+            .AsNoTracking()
             .SingleOrDefaultAsync(u => u.UserId == userId, cancellationToken);
     }
 
     public async Task<UserDetailsView?> GetByUsernameAsync(string username, CancellationToken cancellationToken = default)
     {
         return await _dvldContext.UserDetailsViews
+            .AsNoTracking()
             .SingleOrDefaultAsync(u => u.Username == username, cancellationToken);
     }
 
     public async Task<PagedList<UserView>> GetUsersAsync(GetUsersFilter filter, CancellationToken cancellationToken = default)
     {
-        IQueryable<UserView> query = _dvldContext.UsersViews;
+        IQueryable<UserView> query = _dvldContext.UsersViews.AsNoTracking();
 
         // Filtering
         if (!string.IsNullOrWhiteSpace(filter.Search))
@@ -137,23 +169,29 @@ internal class UserRepository(DvldContext dvldContext) : IUserRepository
             .Skip((filter.PageNumber - 1) * filter.PageSize)
             .Take(filter.PageSize)
             .ToListAsync(cancellationToken);
-
+        int totalCount = 0;
+        
+        if (items.Any())
+            totalCount = items.Count;
+        
         return new PagedList<UserView>(
             items,
-            items.Count,
+            totalCount,
             filter.PageNumber,
             filter.PageSize);
     }
 
-    public async Task<bool> IsUsernameUniqueAsync(string username, CancellationToken cancellationToken = default)
+    private async Task<bool> IsUsernameUniqueAsync(string username, CancellationToken cancellationToken = default)
     {
         return !await _dvldContext.UserDetailsViews
+            .AsNoTracking()
             .AnyAsync(u => u.Username == username, cancellationToken);
     }
 
-    public async Task<bool> ExistsByPersonIdAsync(Guid personId, CancellationToken cancellationToken = default)
+    private async Task<bool> ExistsByPersonIdAsync(Guid personId, CancellationToken cancellationToken = default)
     {
         return await _dvldContext.UserDetailsViews
+            .AsNoTracking()
             .AnyAsync(u => u.PersonId == personId, cancellationToken);
     }
 
@@ -168,13 +206,37 @@ internal class UserRepository(DvldContext dvldContext) : IUserRepository
             user.Deactivate();
     }
 
-    public async Task ChangeUserLockStatusAsync(Guid userId, bool isLocked, CancellationToken cancellationToken = default)
+    public async Task ChangeUserLockStatusAsync(Guid userId, bool isLocked, LockDurationType? durationType,
+        int? duration,CancellationToken cancellationToken = default)
     {
         var user = await GetAsync(userId, cancellationToken);
         if(user is null)
             throw new KeyNotFoundException($"User with User ID : {userId} was not found");
-        if(isLocked)
-            user.Lock();
+        if (isLocked)
+        {
+            DateTime lockedUntil;
+            switch (durationType)
+            {
+                case LockDurationType.Minutes or null:
+                    lockedUntil = DateTime.UtcNow.AddMinutes(duration ?? 3);
+                    break;
+                case LockDurationType.Hours:
+                    lockedUntil = DateTime.UtcNow.AddHours(duration ?? 1);
+                    break;
+                case LockDurationType.Days:
+                    lockedUntil = DateTime.UtcNow.AddDays(duration ?? 1);
+                    break;
+                case LockDurationType.Months:
+                    lockedUntil = DateTime.UtcNow.AddMonths(duration ?? 1);
+                    break;
+                case LockDurationType.Years:
+                    lockedUntil = DateTime.UtcNow.AddYears(duration ?? 1);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(durationType), durationType, null);
+            }
+            user.Lock(lockedUntil);   
+        }
         else
             user.Unlock();
     }
@@ -187,7 +249,9 @@ internal class UserRepository(DvldContext dvldContext) : IUserRepository
 
     private async Task<bool> UserHasRole(Guid userId, int roleId, CancellationToken cancellationToken = default)
     {
-        return await _dvldContext.UserRoles.AnyAsync(ur => ur.UserId == userId && ur.RoleId == roleId,
+        return await _dvldContext.UserRoles
+            .AsNoTracking()
+            .AnyAsync(ur => ur.UserId == userId && ur.RoleId == roleId,
             cancellationToken);
     }
 }

@@ -18,10 +18,15 @@ public static class DependencyInjection
         services.AddDbContext<DvldContext>(options =>
             options.UseSqlServer(
                 configuration.GetConnectionString("DeveloperConnection")));
-
+        //Unit of Work
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+        
+        //Repositories
         services.AddScoped<IPersonRepository, PersonRepository>();
         services.AddScoped<IAddressRepository, AddressRepository>();
+        services.AddScoped<IUserRepository, UserRepository>();
+        
+        //Services
         services.AddScoped<IImageService, ImageService>();
 
         return services;
