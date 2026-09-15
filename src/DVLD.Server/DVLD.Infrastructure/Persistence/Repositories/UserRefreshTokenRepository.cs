@@ -10,22 +10,25 @@ public class UserRefreshTokenRepository(DvldContext dvldContext) : IUserRefreshT
     private readonly DvldContext _dvldContext = dvldContext;
 
     public async Task CreateRefreshTokenAsync(Guid userId, string tokenHash, DateTime expiresAt, string? createdByIp = null,
-        string? userAgent = null)
+        string? userAgent = null,CancellationToken cancellationToken = default)
     {
         var newToken = UserRefreshToken.Create(userId, tokenHash, expiresAt, createdByIp, userAgent);
         
-        await RevokeRefreshTokenAsync(userId,createdByIp, newToken.RefreshTokenId);
+        await RevokeRefreshTokenAsync(userId,createdByIp, newToken.RefreshTokenId, cancellationToken);
         
         _dvldContext.UserRefreshTokens.Add(newToken);
     }
 
-    public async Task RevokeRefreshTokenAsync(Guid userId, string? revokedByIp = null, Guid? replacedByTokenId = null)
+    public async Task RevokeRefreshTokenAsync(Guid userId, string? revokedByIp = null, Guid? replacedByTokenId = null
+        ,CancellationToken cancellationToken = default)
     {
         var userRefreshToken = await _dvldContext.UserRefreshTokens.Where(r => r.UserId == userId)
             .OrderBy(r => r.CreatedAt)
-            .LastOrDefaultAsync();
+            .LastOrDefaultAsync(cancellationToken: cancellationToken);
+
+        if (userRefreshToken is null)
+            throw new KeyNotFoundException("User Refresh Token was not found");
         
-        if (userRefreshToken is not null)
-            userRefreshToken.Revoke(revokedByIp, replacedByTokenId);
+        userRefreshToken.Revoke(revokedByIp, replacedByTokenId);
     }
 }

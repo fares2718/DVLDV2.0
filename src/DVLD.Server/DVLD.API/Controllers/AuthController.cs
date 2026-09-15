@@ -1,4 +1,5 @@
 using DVLD.Application.Features.Authentication.Login;
+using DVLD.Application.Features.Authentication.Logout;
 using DVLD.Contract.Authentication;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -47,5 +48,50 @@ public class AuthController(ISender sender) : BaseController(sender)
         
         return Ok("Login success");
     }
-    
+
+    [HttpPost("logout")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+
+    public async Task<IActionResult> Logout(CancellationToken cancellationToken = default)
+    {
+        if (Request.Cookies.TryGetValue("token", out string? token))
+        {
+            try
+            {
+                var handler = new System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler();
+                var jwtToken = handler.ReadJwtToken(token);
+
+                var userIdClaim = jwtToken.Claims.FirstOrDefault(c => c.Type is System.Security.Claims.ClaimTypes.NameIdentifier or "sub");
+                if (userIdClaim is null || string.IsNullOrEmpty(userIdClaim.Value))
+                    return Ok();//ignore telling for security reasons 
+                
+                var userId = Guid.Parse(userIdClaim.Value);
+                var revokedByIp = Request.HttpContext.Connection.RemoteIpAddress?.ToString();
+
+                var cmd = new LogoutCommand(userId, revokedByIp);
+                await Sender.Send(cmd,cancellationToken);
+            }
+            catch
+            {
+                // Fail silently on token parsing issues during logout 
+                // to ensure client cookies still get cleaned up below
+            }
+        }
+        var cookieOptions = new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.None,
+            IsEssential = true,
+            Domain = "localhost",
+            Expires = DateTime.UtcNow.AddDays(-1)
+        };
+
+        Response.Cookies.Delete("token", cookieOptions);
+        Response.Cookies.Delete("refreshToken", cookieOptions);
+        return Ok("Logout success");
+    }
 }
