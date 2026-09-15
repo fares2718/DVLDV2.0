@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DVLD.API.Controllers
 {
-    public class PersonController(ISender sender) : BaseController(sender)
+    public class PersonController(ISender sender,IHttpContextAccessor accessor) : BaseController(sender,accessor)
     {
         [HttpPatch("activate-person/{personId:guid}")]
         [ProducesResponseType(StatusCodes.Status200OK)]

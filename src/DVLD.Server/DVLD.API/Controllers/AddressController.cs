@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DVLD.API.Controllers;
 
-public class AddressController(ISender sender) : BaseController(sender)
+public class AddressController(ISender sender,IHttpContextAccessor accessor) : BaseController(sender,accessor)
 {
     [HttpPost("add-address")]
     [ProducesResponseType(StatusCodes.Status201Created)]

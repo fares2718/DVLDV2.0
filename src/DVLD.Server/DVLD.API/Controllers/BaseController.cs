@@ -1,14 +1,17 @@
 using ErrorOr;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DVLD.API.Controllers;
 
+[Authorize]
 [Route("api/[controller]")]
 [ApiController]
-public class BaseController(ISender sender) : ControllerBase
+public class BaseController(ISender sender, IHttpContextAccessor httpContextAccessor) : ControllerBase
 {
     protected readonly ISender Sender = sender;
+    protected readonly IHttpContextAccessor HttpContextAccessor = httpContextAccessor;
 
     protected IActionResult HandleErrors(List<Error> errors)
     {

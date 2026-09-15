@@ -28,7 +28,7 @@ public class UserRefreshTokenRepository(DvldContext dvldContext) : IUserRefreshT
 
         if (userRefreshToken is null)
             throw new KeyNotFoundException("User Refresh Token was not found");
-        
-        userRefreshToken.Revoke(revokedByIp, replacedByTokenId);
+        if(!userRefreshToken.IsExpired())
+            userRefreshToken.Revoke(revokedByIp, replacedByTokenId);
     }
 }

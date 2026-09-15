@@ -11,8 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DVLD.API.Controllers;
 
-[Authorize]
-public class UserController(ISender sender) : BaseController(sender)
+public class UserController(ISender sender,IHttpContextAccessor accessor) : BaseController(sender,accessor)
 {
 
     [HttpPost("create-user")]

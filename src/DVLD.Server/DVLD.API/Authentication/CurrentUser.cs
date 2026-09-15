@@ -16,7 +16,7 @@ public class CurrentUser (IHttpContextAccessor accessor):ICurrentUser
     public string Username =>
         _accessor.HttpContext!
             .User
-            .FindFirstValue(ClaimTypes.Name)!;
+            .FindFirstValue(ClaimTypes.Email)!;
 
     public IReadOnlyList<string> Roles =>
         _accessor.HttpContext!
