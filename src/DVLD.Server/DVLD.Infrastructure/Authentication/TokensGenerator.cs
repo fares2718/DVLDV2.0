@@ -20,8 +20,10 @@ internal sealed class TokensGenerator(IConfiguration configuration) : ITokensGen
             new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
             new Claim(ClaimTypes.Email, user.Username!)
         };
+
+        List<string> roles = new List<string>(user.Roles?.Split(',') ?? Array.Empty<string>());
         
-        foreach (var role in user.Roles)
+        foreach (var role in roles)
         {
             claims.Add(new Claim(ClaimTypes.Role, role));
         }

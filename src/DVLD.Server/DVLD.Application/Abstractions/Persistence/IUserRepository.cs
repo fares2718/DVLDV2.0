@@ -23,6 +23,8 @@ public interface IUserRepository
     Task<UserDetailsView?> GetByUsernameAsync(
         string username,
         CancellationToken cancellationToken = default);
+
+    Task<AuthenticationUserView?> GetAuthModelByUsernameAsync(string username,CancellationToken cancellationToken = default);
     
     Task<PagedList<UserView>> GetUsersAsync(
     GetUsersFilter filter,

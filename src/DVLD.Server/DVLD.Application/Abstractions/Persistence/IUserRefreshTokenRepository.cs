@@ -6,9 +6,11 @@ public interface IUserRefreshTokenRepository
         string tokenHash,
         DateTime expiresAt,
         string? createdByIp = null,
-        string? userAgent = null);
+        string? userAgent = null,
+        CancellationToken cancellationToken = default);
 
     Task RevokeRefreshTokenAsync(Guid userId,
         string? revokedByIp = null,
-        Guid? replacedByTokenId = null);
+        Guid? replacedByTokenId = null,
+        CancellationToken cancellationToken = default);
 }
