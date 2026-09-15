@@ -6,10 +6,12 @@ using DVLD.Application.Filters.User;
 using DVLD.Contract.User.Requests;
 using DVLD.Contract.User.Responses;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DVLD.API.Controllers;
 
+[Authorize]
 public class UserController(ISender sender) : BaseController(sender)
 {
 

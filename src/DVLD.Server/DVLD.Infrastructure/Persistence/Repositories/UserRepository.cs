@@ -90,6 +90,13 @@ internal class UserRepository(DvldContext dvldContext) : IUserRepository
             .SingleOrDefaultAsync(u => u.Username == username, cancellationToken);
     }
 
+    public async Task<AuthenticationUserView?> GetAuthModelByUsernameAsync(string username, CancellationToken cancellationToken = default)
+    {
+        return await _dvldContext.AuthenticationUserViews
+            .AsNoTracking()
+            .SingleOrDefaultAsync(u => u.Username == username, cancellationToken);
+    }
+
     public async Task<PagedList<UserView>> GetUsersAsync(GetUsersFilter filter, CancellationToken cancellationToken = default)
     {
         IQueryable<UserView> query = _dvldContext.UsersViews.AsNoTracking();

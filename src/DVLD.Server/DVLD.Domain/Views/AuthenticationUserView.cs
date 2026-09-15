@@ -8,5 +8,5 @@ public sealed class AuthenticationUserView
 
     public string PasswordHash { get; private set; } = null!;
 
-    public List<string> Roles { get; private set; } = new List<string>();
+    public string? Roles { get; private set; }
 }
