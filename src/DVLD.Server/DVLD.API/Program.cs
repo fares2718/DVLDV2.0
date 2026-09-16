@@ -24,6 +24,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseCors("DVLD.Server.CORS");
+
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
