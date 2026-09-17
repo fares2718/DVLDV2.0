@@ -9,6 +9,7 @@ public interface IUnitOfWork
     public IAddressRepository AddressRepository { get;  }
     public IUserRepository UserRepository { get; }
     public IUserRefreshTokenRepository UserRefreshTokenRepository { get; }
+    public IRoleRepository RoleRepository { get; }
     
     Task SaveChangesAsync(CancellationToken cancellationToken = default);
 }

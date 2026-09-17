@@ -4,7 +4,7 @@ using DVLD.Infrastructure.Persistence.Context;
 
 namespace DVLD.Infrastructure.Persistence.Repositories;
 
-internal class UnitOfWork(IPersonRepository personRepository, IAddressRepository addressRepository, IUserRepository userRepository, DvldContext dvldContext, ITokensGenerator tokensGenerator, IUserRefreshTokenRepository userRefreshTokenRepository) : IUnitOfWork
+internal class UnitOfWork(IPersonRepository personRepository, IAddressRepository addressRepository, IUserRepository userRepository, DvldContext dvldContext, ITokensGenerator tokensGenerator, IUserRefreshTokenRepository userRefreshTokenRepository, IRoleRepository roleRepository) : IUnitOfWork
 {
     private readonly DvldContext _dvldContext = dvldContext;
     //JWT
@@ -15,6 +15,7 @@ internal class UnitOfWork(IPersonRepository personRepository, IAddressRepository
     public IAddressRepository AddressRepository { get;  } = addressRepository;
     public IUserRepository UserRepository { get; } = userRepository;
     public IUserRefreshTokenRepository UserRefreshTokenRepository { get; } = userRefreshTokenRepository;
+    public IRoleRepository RoleRepository { get; } = roleRepository;
 
     public async Task SaveChangesAsync(CancellationToken cancellationToken = default)
     {

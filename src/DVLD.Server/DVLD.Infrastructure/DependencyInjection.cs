@@ -32,6 +32,7 @@ public static class DependencyInjection
         services.AddScoped<IAddressRepository, AddressRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IUserRefreshTokenRepository, UserRefreshTokenRepository>();
+        services.AddScoped<IRoleRepository, RoleRepository>();
         
         //Services
         services.AddScoped<IImageService, ImageService>();

@@ -16,6 +16,8 @@ public interface IUserRepository
     Task RemoveRoleAsync(Guid userId, int roleId,CancellationToken cancellationToken = default);
 
     // Queries
+    
+    Task<User?> GetAsync(Guid userId, CancellationToken cancellationToken = default);
     Task<UserDetailsView?> GetByIdAsync(
         Guid userId,
         CancellationToken cancellationToken = default);
@@ -24,11 +26,13 @@ public interface IUserRepository
         string username,
         CancellationToken cancellationToken = default);
 
-    Task<AuthenticationUserView?> GetAuthModelByUsernameAsync(string username,CancellationToken cancellationToken = default);
+    Task<User?> GetAuthModelByUsernameAsync(string username,CancellationToken cancellationToken = default);
     
     Task<PagedList<UserView>> GetUsersAsync(
     GetUsersFilter filter,
     CancellationToken cancellationToken = default);
+
+    Task<List<string>> GetUserRoles(Guid userId, CancellationToken cancellationToken = default);
 
     // Account status
     Task ChangeUserActivationStatusAsync(

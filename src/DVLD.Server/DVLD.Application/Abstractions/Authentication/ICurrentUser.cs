@@ -4,5 +4,6 @@ public interface ICurrentUser
 {
     Guid UserId { get; }
     string Username { get; }
-    IReadOnlyList<string> Roles { get; }
+    List<string> Roles { get; }
+    long Permissions { get; }
 }

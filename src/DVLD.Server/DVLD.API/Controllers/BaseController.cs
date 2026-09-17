@@ -30,7 +30,7 @@ public class BaseController(ISender sender, IHttpContextAccessor httpContextAcce
 
             ErrorType.Conflict => Conflict(errors),
 
-            ErrorType.Unauthorized => Unauthorized(),
+            ErrorType.Unauthorized => Unauthorized(errors),
 
             ErrorType.Forbidden => Forbid(),
 

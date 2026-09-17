@@ -18,10 +18,12 @@ public class CurrentUser (IHttpContextAccessor accessor):ICurrentUser
             .User
             .FindFirstValue(ClaimTypes.Email)!;
 
-    public IReadOnlyList<string> Roles =>
+    public List<string> Roles =>
         _accessor.HttpContext!
             .User
             .FindAll(ClaimTypes.Role)
             .Select(x => x.Value)
-            .ToArray();
+            .ToList();
+    
+    public long Permissions { get; set; }
 }

@@ -90,11 +90,19 @@ internal class UserRepository(DvldContext dvldContext) : IUserRepository
             .SingleOrDefaultAsync(u => u.Username == username, cancellationToken);
     }
 
-    public async Task<AuthenticationUserView?> GetAuthModelByUsernameAsync(string username, CancellationToken cancellationToken = default)
+    public async Task<User?> GetAuthModelByUsernameAsync(string username, CancellationToken cancellationToken = default)
     {
-        return await _dvldContext.AuthenticationUserViews
+        return await _dvldContext.Users
             .AsNoTracking()
             .SingleOrDefaultAsync(u => u.Username == username, cancellationToken);
+    }
+
+    public async Task<List<string>> GetUserRoles(Guid userId,CancellationToken cancellationToken = default)
+    {
+        return await _dvldContext.UserRoles
+            .Where(ur => ur.UserId == userId)
+            .Join(_dvldContext.Roles, ur => ur.RoleId, r => r.RoleId, (ur, r) => r.Name)
+            .ToListAsync(cancellationToken);
     }
 
     public async Task<PagedList<UserView>> GetUsersAsync(GetUsersFilter filter, CancellationToken cancellationToken = default)
@@ -248,7 +256,7 @@ internal class UserRepository(DvldContext dvldContext) : IUserRepository
             user.Unlock();
     }
     
-    private async Task<User?> GetAsync(Guid userId, CancellationToken cancellationToken = default)
+    public async Task<User?> GetAsync(Guid userId, CancellationToken cancellationToken = default)
     {
         var user = await _dvldContext.Users.FindAsync(userId,cancellationToken);
         return user;

@@ -25,17 +25,22 @@ public class LoginCommandHandler(IUnitOfWork uow, LoginCommandValidator validato
             return Error.Unauthorized("Authentication.Failed","Username or password is incorrect");
 
         if (!BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
-            return Error.Unauthorized("Authentication.Failed","Username or password is incorrect");
+        {
+            user.RecordFailedLogin();
+            await _uow.SaveChangesAsync(cancellationToken);
+            return Error.Unauthorized("Authentication.Failed", "Username or password is incorrect");
+        }
 
         try
         {
-            string accessToken = _tokensGenerator.GenerateToken(user);
+            var roles = await _uow.UserRepository.GetUserRoles(user.UserId, cancellationToken);
+            string accessToken = _tokensGenerator.GenerateToken(user,roles);
             string refreshToken = _tokensGenerator.GenerateRefreshToken();
 
             string refreshTokenHash = BCrypt.Net.BCrypt.HashPassword(refreshToken);
 
             await _uow.UserRefreshTokenRepository.CreateRefreshTokenAsync(user.UserId,refreshTokenHash,DateTime.UtcNow.AddHours(2),request.CreatedByIp,request.UserAgent, cancellationToken);
-            
+            user.RecordSuccessfulLogin();
             await _uow.SaveChangesAsync(cancellationToken);
             return new TokensDto(accessToken, refreshTokenHash);
         }
