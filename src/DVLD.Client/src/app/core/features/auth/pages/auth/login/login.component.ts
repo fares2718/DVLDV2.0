@@ -1,7 +1,8 @@
 import { Component, inject } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { AuthService } from '../../../../auth/auth.service';
-import { LoginRequest } from '../../models/login-request';
+import { AuthService } from '../../../../../auth/auth.service';
+import { LoginRequest } from '../../../models/login-request';
+import { Router } from '@angular/router';
 
 @Component({
   imports: [ReactiveFormsModule],
@@ -11,6 +12,7 @@ import { LoginRequest } from '../../models/login-request';
 })
 export class LoginComponent {
   private authService = inject(AuthService);
+  private route = inject(Router);
   form = new FormGroup({
     username: new FormControl('', {
       validators: [Validators.required],
@@ -45,7 +47,7 @@ export class LoginComponent {
     };
     this.authService.login(loginRequest).subscribe({
       next: (response) => {
-        console.log('LOGIN SUCCESS:', response);
+        // this.route.navigate('home');
       },
 
       error: (error) => {

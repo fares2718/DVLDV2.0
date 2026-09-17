@@ -1,9 +1,9 @@
 import { Component, signal } from '@angular/core';
-import { AuthLayoutComponent } from './core/features/layout/auth-layout/auth-layout.component';
+import { RouterOutlet } from '../../node_modules/@angular/router/types/_router_module-chunk';
 
 @Component({
   selector: 'app-root',
-  imports: [AuthLayoutComponent],
+  imports: [RouterOutlet],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
 })
