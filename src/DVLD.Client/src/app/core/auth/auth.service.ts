@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment.development';
 import { HttpClient } from '@angular/common/http';
-import { LoginRequest } from '../features/auth/models/login-request';
-import { CurrentUser } from '../features/auth/models/current-user';
+import { LoginRequest } from '../../features/auth/models/login-request';
+import { CurrentUser } from '../../features/auth/models/current-user';
 
 @Injectable({
   providedIn: 'root',
@@ -13,7 +13,10 @@ export class AuthService {
   constructor(private http: HttpClient) {}
 
   login(request: LoginRequest) {
-    return this.http.post<void>(`${this.apiUrl}/login`, request, { withCredentials: true });
+    return this.http.post<string>(`${this.apiUrl}/login`, request, {
+      responseType: 'text',
+      withCredentials: true,
+    });
   }
 
   currentUser() {

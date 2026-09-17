@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { AuthService } from '../../../../../auth/auth.service';
+import { AuthService } from '../../../../../core/auth/auth.service';
 import { LoginRequest } from '../../../models/login-request';
 import { Router } from '@angular/router';
 
@@ -47,7 +47,7 @@ export class LoginComponent {
     };
     this.authService.login(loginRequest).subscribe({
       next: (response) => {
-        // this.route.navigate('home');
+        console.log(response);
       },
 
       error: (error) => {
@@ -56,6 +56,11 @@ export class LoginComponent {
 
       complete: () => {
         console.log('LOGIN COMPLETED');
+        this.authService.currentUser().subscribe({
+          next: (currentUser) => {
+            console.log('CURRENT USER:', currentUser);
+          },
+        });
       },
     });
   }

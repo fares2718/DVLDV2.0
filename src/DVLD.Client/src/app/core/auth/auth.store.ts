@@ -1,5 +1,5 @@
 import { computed, Injectable, signal } from '@angular/core';
-import { CurrentUser } from '../features/auth/models/current-user';
+import { CurrentUser } from '../../features/auth/models/current-user';
 
 @Injectable({
   providedIn: 'root',

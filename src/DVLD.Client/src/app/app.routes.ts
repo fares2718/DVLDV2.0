@@ -8,7 +8,6 @@ export const routes: Routes = [
   },
   {
     path: 'auth',
-    loadChildren: () =>
-      import('./core/features/auth/pages/auth/auth.routs').then((m) => m.authRoutes),
+    loadChildren: () => import('./features/auth/auth.routs').then((m) => m.authRoutes),
   },
 ];

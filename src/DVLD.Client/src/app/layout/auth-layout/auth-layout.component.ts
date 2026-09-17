@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { LoginComponent } from '../../auth/pages/auth/login/login.component';
+import { LoginComponent } from '../../features/auth/pages/auth/login/login.component';
 
 @Component({
   imports: [LoginComponent],
