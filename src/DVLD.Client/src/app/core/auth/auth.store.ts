@@ -1,5 +1,6 @@
 import { computed, Injectable, signal } from '@angular/core';
 import { CurrentUser } from '../../features/auth/models/current-user';
+import { Permission } from './permissions';
 
 @Injectable({
   providedIn: 'root',
@@ -25,5 +26,15 @@ export class AuthStore {
 
   setInitialized() {
     this._isInitialized.set(true);
+  }
+
+  hasPermission(permission: Permission): boolean {
+    const user = this.user();
+
+    if (!user) {
+      return false;
+    }
+
+    return (user.permissions & permission) === permission;
   }
 }

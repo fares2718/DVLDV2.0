@@ -107,7 +107,7 @@ public class AuthController(ISender sender,IHttpContextAccessor accessor) : Base
     
     public async Task<IActionResult> GetCurrentUser()
     {
-        if(!Request.Cookies.TryGetValue("token", out string? token) || string.IsNullOrEmpty(token))
+        if(HttpContext.User.Identity is { IsAuthenticated: false })
             return Unauthorized("You are not authorized");
         
         var currentUser = new CurrentUser(HttpContextAccessor);
