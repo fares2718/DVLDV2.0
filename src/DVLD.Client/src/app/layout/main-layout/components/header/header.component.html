@@ -1,0 +1,25 @@
+<header
+  class="flex h-16 items-center justify-between border-b border-gray-200 bg-white px-4 sm:px-6"
+>
+  <!-- Mobile menu later -->
+  <button type="button" class="rounded-lg p-2 text-gray-500 hover:bg-gray-100 lg:hidden">☰</button>
+
+  <!-- User -->
+  <div class="ml-auto flex items-center gap-3">
+    <div class="hidden text-right sm:block">
+      <p class="text-sm font-medium text-gray-900">
+        {{ authStore.user()?.username }}
+      </p>
+
+      <p class="text-xs text-gray-500">
+        {{ authStore.user()?.roles?.join(', ') }}
+      </p>
+    </div>
+
+    <div
+      class="flex h-9 w-9 items-center justify-center rounded-full bg-gray-900 text-sm font-semibold text-white"
+    >
+      {{ authStore.user()?.username?.charAt(0)?.toUpperCase() }}
+    </div>
+  </div>
+</header>

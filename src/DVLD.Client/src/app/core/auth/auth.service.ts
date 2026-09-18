@@ -1,14 +1,17 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment.development';
 import { HttpClient } from '@angular/common/http';
 import { LoginRequest } from '../../features/auth/models/login-request';
 import { CurrentUser } from '../../features/auth/models/current-user';
+import { catchError, Observable, of, tap } from 'rxjs';
+import { AuthStore } from './auth.store';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
   private readonly apiUrl = `${environment.apiUrl}/auth`;
+  private authStore = inject(AuthStore);
 
   constructor(private http: HttpClient) {}
 
@@ -29,5 +32,15 @@ export class AuthService {
 
   logout() {
     return this.http.post<void>(`${this.apiUrl}/logout`, {}, { withCredentials: true });
+  }
+
+  initialize(): Observable<CurrentUser | null> {
+    return this.currentUser().pipe(
+      tap((user) => this.authStore.setUser(user)),
+      catchError(() => {
+        this.authStore.clear();
+        return of(null);
+      }),
+    );
   }
 }
