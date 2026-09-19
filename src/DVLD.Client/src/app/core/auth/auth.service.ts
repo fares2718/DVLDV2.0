@@ -10,10 +10,9 @@ import { AuthStore } from './auth.store';
   providedIn: 'root',
 })
 export class AuthService {
-  private readonly apiUrl = `${environment.apiUrl}/auth`;
+  private readonly apiUrl = `${environment.apiUrl}/Auth`;
   private authStore = inject(AuthStore);
-
-  constructor(private http: HttpClient) {}
+  private http = inject(HttpClient);
 
   login(request: LoginRequest) {
     return this.http.post<string>(`${this.apiUrl}/login`, request, {
