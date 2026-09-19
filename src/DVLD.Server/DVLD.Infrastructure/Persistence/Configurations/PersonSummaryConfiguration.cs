@@ -40,10 +40,13 @@ public class PersonSummaryConfiguration
         builder.Property(x => x.Gender)
             .HasColumnName("Gender");
 
-        builder.Property(x => x.NationalityCountryCode)
-            .HasColumnName("NationalityCountryCode");
+        builder.Property(x => x.Nationality)
+            .HasColumnName("Nationality");
 
         builder.Property(x => x.IsActive)
             .HasColumnName("IsActive");
+        
+        builder.Property(x => x.ImagePath)
+            .HasColumnName("ImagePath");
     }
 }

@@ -27,6 +27,7 @@ if (app.Environment.IsDevelopment())
 app.UseCors("DVLD.Server.CORS");
 
 app.UseHttpsRedirection();
+app.UseStaticFiles();
 
 app.UseAuthorization();
 

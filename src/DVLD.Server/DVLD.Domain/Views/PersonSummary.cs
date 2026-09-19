@@ -19,9 +19,10 @@ public class PersonSummary
 
     public string Gender { get; private set; } = null!;
 
-    public string NationalityCountryCode { get; private set; } = null!;
+    public string Nationality { get; private set; } = null!;
 
     public bool IsActive { get; private set; }
+    public string? ImagePath { get; private set; }
     
     private PersonSummary(){}
 }

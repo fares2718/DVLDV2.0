@@ -1,17 +1,21 @@
 import { Component, computed, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
+import { environment } from '../../../../environments/environment.development';
 import { PeopleService } from '../../../core/people/people.service';
+import type { PersonSummary } from '../models/person-summary';
 import type { PeopleFilter } from '../models/people-filter';
 
 @Component({
   selector: 'app-people-summary',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, RouterLink],
   styleUrl: './people-summary.component.css',
   templateUrl: './people-summary.component.html',
 })
 export class PeopleSummaryComponent implements OnInit {
   private readonly _peopleService = inject(PeopleService);
+  private readonly _router = inject(Router);
 
   private readonly defaultFilter: PeopleFilter = {
     isDescending: false,
@@ -106,5 +110,42 @@ export class PeopleSummaryComponent implements OnInit {
     this.filter.pageSize = pageSize;
     this.filter.pageNumber = 1;
     this.loadPeople();
+  }
+
+  personImageUrl(person: PersonSummary): string | null {
+    const rawImageUrl = person.imagePath?.trim();
+
+    if (!rawImageUrl || rawImageUrl === 'string' || rawImageUrl === 'null') {
+      return null;
+    }
+
+    if (/^https?:\/\//i.test(rawImageUrl)) {
+      return rawImageUrl;
+    }
+
+    const serverBaseUrl = environment.apiUrl.replace(/\/$/, '').replace(/\/api$/i, '');
+    const normalizedPath = rawImageUrl.replace(/\\/g, '/');
+    const pathWithoutWwwRoot = normalizedPath.includes('/wwwroot/')
+      ? normalizedPath.split(/\/wwwroot\//i)[1]
+      : normalizedPath
+          .replace(/^.*?\/wwwroot\//i, '')
+          .replace(/^wwwroot\//i, '')
+          .replace(/^\//, '');
+
+    if (!pathWithoutWwwRoot || pathWithoutWwwRoot === 'string') {
+      return null;
+    }
+
+    return new URL(`/${pathWithoutWwwRoot}`, `${serverBaseUrl}/`).toString();
+  }
+
+  personInitial(person: PersonSummary): string {
+    return person.fullName?.trim()?.charAt(0)?.toUpperCase() ?? '?';
+  }
+
+  viewPerson(person: PersonSummary): void {
+    this._router.navigate([`/people/${person.personId}`], {
+      state: { person },
+    });
   }
 }

@@ -3,7 +3,7 @@ import { environment } from '../../../environments/environment.development';
 import { HttpClient } from '@angular/common/http';
 import { LoginRequest } from '../../features/auth/models/login-request';
 import { CurrentUser } from '../../features/auth/models/current-user';
-import { catchError, Observable, of, tap } from 'rxjs';
+import { catchError, Observable, of, switchMap, tap } from 'rxjs';
 import { AuthStore } from './auth.store';
 
 @Injectable({
@@ -36,8 +36,25 @@ export class AuthService {
   initialize(): Observable<CurrentUser | null> {
     return this.currentUser().pipe(
       tap((user) => this.authStore.setUser(user)),
+      catchError((error) => {
+        if (error?.status === 401) {
+          return this.refresh().pipe(
+            switchMap(() => this.currentUser()),
+            tap((user) => this.authStore.setUser(user)),
+            catchError(() => {
+              this.authStore.clear();
+              return of(null);
+            }),
+          );
+        }
+
+        this.authStore.clear();
+        return of(null);
+      }),
+      tap(() => this.authStore.setInitialized()),
       catchError(() => {
         this.authStore.clear();
+        this.authStore.setInitialized();
         return of(null);
       }),
     );

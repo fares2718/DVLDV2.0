@@ -9,6 +9,7 @@
 
       <button
         type="button"
+        routerLink="/people/create"
         class="inline-flex items-center justify-center gap-2 rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2"
       >
         <svg
@@ -317,12 +318,31 @@
               <tr class="transition hover:bg-gray-50">
                 <td class="whitespace-nowrap px-6 py-4">
                   <div class="flex items-center gap-3">
-                    <div
-                      class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gray-900 text-sm font-semibold text-white"
-                      aria-hidden="true"
-                    >
-                      {{ person.fullName.charAt(0) }}
-                    </div>
+                    @if (personImageUrl(person); as imageUrl) {
+                      <img
+                        [src]="imageUrl"
+                        [alt]="person.fullName"
+                        class="h-10 w-10 shrink-0 rounded-full object-cover ring-2 ring-white"
+                        onerror="
+                          this.style.display = 'none';
+                          this.nextElementSibling.style.display = 'flex';
+                        "
+                      />
+
+                      <div
+                        class="hidden h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gray-900 text-sm font-semibold text-white"
+                        aria-hidden="true"
+                      >
+                        {{ personInitial(person) }}
+                      </div>
+                    } @else {
+                      <div
+                        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gray-900 text-sm font-semibold text-white"
+                        aria-hidden="true"
+                      >
+                        {{ personInitial(person) }}
+                      </div>
+                    }
 
                     <div>
                       <p class="font-medium text-gray-900">
@@ -393,6 +413,7 @@
                 <td class="whitespace-nowrap px-6 py-4 text-right">
                   <button
                     type="button"
+                    (click)="viewPerson(person)"
                     [attr.aria-label]="'View ' + person.fullName"
                     title="View person"
                     class="rounded-lg p-2 text-gray-400 transition hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2"

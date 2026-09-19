@@ -1,0 +1,193 @@
+<div class="min-h-screen bg-gray-100 px-4 py-6 sm:px-6 lg:px-8">
+  <div class="mx-auto max-w-5xl">
+    <div class="mb-6 flex items-center justify-between gap-4">
+      <div>
+        <p class="text-sm font-medium uppercase tracking-[0.2em] text-gray-500">People</p>
+        <h1 class="mt-1 text-3xl font-bold text-gray-900">Create Person</h1>
+      </div>
+
+      <button
+        type="button"
+        routerLink="/people"
+        class="rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-sm transition hover:bg-gray-50"
+      >
+        Back to list
+      </button>
+    </div>
+
+    <form
+      [formGroup]="form"
+      (ngSubmit)="submitPerson()"
+      class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm"
+    >
+      <div class="border-b border-gray-200 px-6 py-5">
+        <h2 class="text-lg font-semibold text-gray-900">Person information</h2>
+        <p class="mt-1 text-sm text-gray-500">Enter the required information for the new person.</p>
+      </div>
+
+      <div class="grid grid-cols-1 gap-5 px-6 py-6 md:grid-cols-2">
+        <div>
+          <label for="nationalId" class="mb-1.5 block text-sm font-medium text-gray-700"
+            >National ID</label
+          >
+          <input
+            id="nationalId"
+            type="text"
+            formControlName="nationalId"
+            class="block w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-900 outline-none transition focus:border-gray-900 focus:ring-1 focus:ring-gray-900"
+          />
+        </div>
+
+        <div>
+          <label for="firstName" class="mb-1.5 block text-sm font-medium text-gray-700"
+            >First Name</label
+          >
+          <input
+            id="firstName"
+            type="text"
+            formControlName="firstName"
+            class="block w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-900 outline-none transition focus:border-gray-900 focus:ring-1 focus:ring-gray-900"
+          />
+        </div>
+
+        <div>
+          <label for="secondName" class="mb-1.5 block text-sm font-medium text-gray-700"
+            >Second Name</label
+          >
+          <input
+            id="secondName"
+            type="text"
+            formControlName="secondName"
+            class="block w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-900 outline-none transition focus:border-gray-900 focus:ring-1 focus:ring-gray-900"
+          />
+        </div>
+
+        <div>
+          <label for="thirdName" class="mb-1.5 block text-sm font-medium text-gray-700"
+            >Third Name</label
+          >
+          <input
+            id="thirdName"
+            type="text"
+            formControlName="thirdName"
+            class="block w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-900 outline-none transition focus:border-gray-900 focus:ring-1 focus:ring-gray-900"
+          />
+        </div>
+
+        <div>
+          <label for="lastName" class="mb-1.5 block text-sm font-medium text-gray-700"
+            >Last Name</label
+          >
+          <input
+            id="lastName"
+            type="text"
+            formControlName="lastName"
+            class="block w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-900 outline-none transition focus:border-gray-900 focus:ring-1 focus:ring-gray-900"
+          />
+        </div>
+
+        <div>
+          <label for="motherName" class="mb-1.5 block text-sm font-medium text-gray-700"
+            >Mother Name</label
+          >
+          <input
+            id="motherName"
+            type="text"
+            formControlName="motherName"
+            class="block w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-900 outline-none transition focus:border-gray-900 focus:ring-1 focus:ring-gray-900"
+          />
+        </div>
+
+        <div>
+          <label for="dateOfBirth" class="mb-1.5 block text-sm font-medium text-gray-700"
+            >Date of Birth</label
+          >
+          <input
+            id="dateOfBirth"
+            type="date"
+            formControlName="dateOfBirth"
+            class="block w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-900 outline-none transition focus:border-gray-900 focus:ring-1 focus:ring-gray-900"
+          />
+        </div>
+
+        <div>
+          <label for="phone" class="mb-1.5 block text-sm font-medium text-gray-700">Phone</label>
+          <input
+            id="phone"
+            type="tel"
+            formControlName="phone"
+            class="block w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-900 outline-none transition focus:border-gray-900 focus:ring-1 focus:ring-gray-900"
+          />
+        </div>
+
+        <div>
+          <label for="email" class="mb-1.5 block text-sm font-medium text-gray-700">Email</label>
+          <input
+            id="email"
+            type="email"
+            formControlName="email"
+            class="block w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-900 outline-none transition focus:border-gray-900 focus:ring-1 focus:ring-gray-900"
+          />
+        </div>
+
+        <div>
+          <label for="nationalityCountryCode" class="mb-1.5 block text-sm font-medium text-gray-700"
+            >Nationality Country Code</label
+          >
+          <input
+            id="nationalityCountryCode"
+            type="text"
+            formControlName="nationalityCountryCode"
+            class="block w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-900 outline-none transition focus:border-gray-900 focus:ring-1 focus:ring-gray-900"
+          />
+        </div>
+
+        <div>
+          <label for="altPhone" class="mb-1.5 block text-sm font-medium text-gray-700"
+            >Alternative Phone</label
+          >
+          <input
+            id="altPhone"
+            type="tel"
+            formControlName="altPhone"
+            class="block w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-900 outline-none transition focus:border-gray-900 focus:ring-1 focus:ring-gray-900"
+          />
+        </div>
+
+        <div class="md:col-span-2">
+          <label class="mb-2 block text-sm font-medium text-gray-700">Gender</label>
+          <div class="flex gap-6 rounded-xl border border-gray-200 bg-gray-50 px-3 py-3">
+            <label class="inline-flex items-center gap-2 text-sm text-gray-700">
+              <input type="radio" formControlName="gender" [value]="true" />
+              Male
+            </label>
+            <label class="inline-flex items-center gap-2 text-sm text-gray-700">
+              <input type="radio" formControlName="gender" [value]="false" />
+              Female
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="flex items-center justify-end gap-3 border-t border-gray-200 bg-gray-50 px-6 py-4"
+      >
+        <button
+          type="button"
+          routerLink="/people"
+          class="rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+        >
+          Cancel
+        </button>
+
+        <button
+          type="submit"
+          [disabled]="form.invalid"
+          class="rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:bg-gray-300"
+        >
+          Add Person
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

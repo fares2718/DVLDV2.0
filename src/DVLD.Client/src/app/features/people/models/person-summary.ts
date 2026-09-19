@@ -8,6 +8,7 @@ export interface PersonSummary {
   altPhone?: string;
   email: string;
   gender: string;
-  nationalityCountryCode: string;
+  nationality: string;
   isActive: boolean;
+  imagePath?: string | null;
 }

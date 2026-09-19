@@ -42,12 +42,19 @@ internal class PersonRepository(DvldContext dvldContext) : IPersonRepository
             throw new KeyNotFoundException($"Person with ID {personId} was not found.");
         person.Deactivate();
     }
-    
-    public async Task<PagedList<PersonSummary>> GetPeopleSummaryAsync( GetPeopleQuery query,
+
+    public async Task<PagedList<PersonSummary>> GetPeopleSummaryAsync(GetPeopleQuery query,
         CancellationToken cancellationToken)
     {
         var peopleSummary = _dvldContext.PeopleSummaries.AsNoTracking();
 
+        var totalCount = await peopleSummary.CountAsync(cancellationToken);
+        if (totalCount == 0)
+            return new PagedList<PersonSummary>(
+            new List<PersonSummary>(),
+            0,
+            query.PageNumber,
+            query.PageSize);
         if (query.IsActive.HasValue)
             peopleSummary = peopleSummary.Where(p => p.IsActive == query.IsActive);
         if (!string.IsNullOrWhiteSpace(query.Search))
@@ -130,7 +137,7 @@ internal class PersonRepository(DvldContext dvldContext) : IPersonRepository
 
            return new PagedList<PersonSummary>(
                items,
-               items.Count,
+               totalCount,
                query.PageNumber,
                query.PageSize);
     }
