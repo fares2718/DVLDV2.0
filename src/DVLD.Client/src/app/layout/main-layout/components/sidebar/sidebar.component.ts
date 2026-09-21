@@ -1,4 +1,4 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, output } from '@angular/core';
 import { Permission } from '../../../../core/auth/permissions';
 import { AuthStore } from '../../../../core/auth/auth.store';
 import { RouterLink, RouterLinkActive } from '@angular/router';
@@ -17,6 +17,8 @@ interface SidebarItem {
 })
 export class SidebarComponent {
   private readonly authStore = inject(AuthStore);
+
+  readonly navigationSelected = output<void>();
 
   private readonly items: SidebarItem[] = [
     {

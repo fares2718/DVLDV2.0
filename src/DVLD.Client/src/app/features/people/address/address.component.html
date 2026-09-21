@@ -1,0 +1,334 @@
+<div class="w-full min-w-0 overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+  <!-- Header -->
+  <div class="border-b border-gray-200 px-4 py-4 sm:px-6 sm:py-5">
+    <div class="flex items-center justify-between gap-4">
+      <div class="min-w-0">
+        <h2 class="text-base font-semibold text-gray-900">Addresses</h2>
+
+        <p class="mt-1 text-sm text-gray-500">
+          {{ addresses().length }}
+          {{ addresses().length === 1 ? 'address' : 'addresses' }}
+          registered for this person.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  @if (addresses().length > 0) {
+    <!-- Address Tabs -->
+    <div class="border-b border-gray-200 px-4 sm:px-6">
+      <div class="-mb-px flex gap-6 overflow-x-auto" role="tablist" aria-label="Person addresses">
+        @for (address of addresses(); track address.addressId) {
+          <button
+            type="button"
+            role="tab"
+            [attr.aria-selected]="selectedAddress?.addressId === address.addressId"
+            (click)="selectAddress(address.addressId)"
+            class="relative whitespace-nowrap py-4 text-sm font-medium transition focus:outline-none"
+            [class.text-gray-900]="selectedAddress?.addressId === address.addressId"
+            [class.text-gray-500]="selectedAddress?.addressId !== address.addressId"
+            [class.hover:text-gray-900]="selectedAddress?.addressId !== address.addressId"
+          >
+            {{ addressLabel(address) }}
+
+            @if (address.isPrimary) {
+              <span
+                class="ml-2 rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600"
+              >
+                Primary
+              </span>
+            }
+
+            @if (selectedAddress?.addressId === address.addressId) {
+              <span
+                class="absolute inset-x-0 bottom-0 h-0.5 rounded-full bg-gray-900"
+                aria-hidden="true"
+              ></span>
+            }
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- Selected Address -->
+    @if (selectedAddress; as address) {
+      <div class="px-4 py-5 sm:px-6 sm:py-6">
+        <!-- Address Summary -->
+        <div class="mb-6 rounded-xl border border-gray-200 bg-gray-50 p-4">
+          <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+            <!-- Address Identity -->
+            <div class="min-w-0">
+              <div class="flex flex-wrap items-center gap-2">
+                <h3 class="break-words text-base font-semibold text-gray-900">
+                  {{ address.addressType }} Address
+                </h3>
+
+                @if (address.isPrimary) {
+                  <span class="rounded-full bg-gray-900 px-2.5 py-1 text-xs font-medium text-white">
+                    Primary
+                  </span>
+                }
+              </div>
+
+              <p class="mt-2 break-words text-sm leading-6 text-gray-600">
+                {{ formatAddress(address) }}
+              </p>
+            </div>
+
+            <!-- Address Actions -->
+            <div class="flex shrink-0 flex-wrap items-center gap-2">
+              <!-- Status -->
+              <span
+                class="inline-flex w-fit items-center rounded-full px-2.5 py-1 text-xs font-medium"
+                [class.bg-gray-100]="address.isActive"
+                [class.text-gray-700]="address.isActive"
+                [class.bg-gray-900]="!address.isActive"
+                [class.text-white]="!address.isActive"
+              >
+                <span
+                  class="mr-1.5 h-1.5 w-1.5 rounded-full"
+                  [class.bg-gray-500]="address.isActive"
+                  [class.bg-white]="!address.isActive"
+                ></span>
+
+                {{ address.isActive ? 'Active' : 'Inactive' }}
+              </span>
+
+              <!-- Activate / Deactivate -->
+              <button
+                type="button"
+                (click)="requestAddressAction(address.isActive ? 'deactivate' : 'activate')"
+                class="cursor-pointer rounded-lg border px-3 py-1.5 text-xs font-medium transition"
+                [class.border-red-200]="address.isActive"
+                [class.bg-white]="address.isActive"
+                [class.text-red-700]="address.isActive"
+                [class.hover:bg-red-50]="address.isActive"
+                [class.border-emerald-200]="!address.isActive"
+                [class.bg-emerald-600]="!address.isActive"
+                [class.text-white]="!address.isActive"
+                [class.hover:bg-emerald-700]="!address.isActive"
+              >
+                {{ address.isActive ? 'Deactivate' : 'Activate' }}
+              </button>
+
+              <!-- Primary -->
+              <button
+                type="button"
+                (click)="requestAddressAction(address.isPrimary ? 'not-primary' : 'primary')"
+                class="cursor-pointer rounded-lg border border-blue-200 bg-white px-3 py-1.5 text-xs font-medium text-blue-700 transition hover:bg-blue-50"
+              >
+                {{ address.isPrimary ? 'Set not primary' : 'Set as primary' }}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Address Information -->
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 [&>div]:min-w-0">
+          <!-- Country -->
+          <div class="min-w-0 rounded-xl border border-gray-200 p-3 sm:p-4">
+            <p
+              class="text-[10px] font-semibold uppercase leading-3 tracking-wide text-gray-500 sm:text-[11px] sm:leading-4"
+            >
+              Country
+            </p>
+
+            <p class="mt-2 break-words text-sm font-medium leading-5 text-gray-900">
+              {{ address.countryCode }}
+            </p>
+          </div>
+
+          <!-- Governorate -->
+          <div class="min-w-0 rounded-xl border border-gray-200 p-3 sm:p-4">
+            <p
+              class="text-[10px] font-semibold uppercase leading-3 tracking-wide text-gray-500 sm:text-[11px] sm:leading-4"
+            >
+              Governorate
+            </p>
+
+            <p class="mt-2 break-words text-sm font-medium leading-5 text-gray-900">
+              {{ address.governorate }}
+            </p>
+          </div>
+
+          <!-- City -->
+          <div class="min-w-0 rounded-xl border border-gray-200 p-3 sm:p-4">
+            <p
+              class="text-[10px] font-semibold uppercase leading-3 tracking-wide text-gray-500 sm:text-[11px] sm:leading-4"
+            >
+              City
+            </p>
+
+            <p class="mt-2 break-words text-sm font-medium leading-5 text-gray-900">
+              {{ address.city }}
+            </p>
+          </div>
+
+          <!-- Street -->
+          <div class="min-w-0 rounded-xl border border-gray-200 p-3 sm:p-4">
+            <p
+              class="text-[10px] font-semibold uppercase leading-3 tracking-wide text-gray-500 sm:text-[11px] sm:leading-4"
+            >
+              Street
+            </p>
+
+            <p class="mt-2 break-words text-sm font-medium leading-5 text-gray-900">
+              {{ address.street }}
+            </p>
+          </div>
+
+          <!-- Building -->
+          <div class="min-w-0 rounded-xl border border-gray-200 p-3 sm:p-4">
+            <p
+              class="text-[10px] font-semibold uppercase leading-3 tracking-wide text-gray-500 sm:text-[11px] sm:leading-4"
+            >
+              Building Number
+            </p>
+
+            <p class="mt-2 break-words text-sm font-medium leading-5 text-gray-900">
+              {{ address.buildingNumber }}
+            </p>
+          </div>
+
+          <!-- Apartment -->
+          <div class="min-w-0 rounded-xl border border-gray-200 p-3 sm:p-4">
+            <p
+              class="text-[10px] font-semibold uppercase leading-3 tracking-wide text-gray-500 sm:text-[11px] sm:leading-4"
+            >
+              Apartment Number
+            </p>
+
+            <p class="mt-2 break-words text-sm font-medium leading-5 text-gray-900">
+              {{ address.apartmentNumber || 'Not provided' }}
+            </p>
+          </div>
+
+          <!-- Postal Code -->
+          <div class="min-w-0 rounded-xl border border-gray-200 p-3 sm:p-4">
+            <p
+              class="text-[10px] font-semibold uppercase leading-3 tracking-wide text-gray-500 sm:text-[11px] sm:leading-4"
+            >
+              Postal Code
+            </p>
+
+            <p class="mt-2 break-words text-sm font-medium leading-5 text-gray-900">
+              {{ address.postalCode || 'Not provided' }}
+            </p>
+          </div>
+
+          <!-- Address Type -->
+          <div class="min-w-0 rounded-xl border border-gray-200 p-3 sm:p-4">
+            <p
+              class="text-[10px] font-semibold uppercase leading-3 tracking-wide text-gray-500 sm:text-[11px] sm:leading-4"
+            >
+              Address Type
+            </p>
+
+            <p class="mt-2 break-words text-sm font-medium leading-5 text-gray-900">
+              {{ address.addressType }}
+            </p>
+          </div>
+
+          <!-- Additional Details -->
+          <div
+            class="min-w-0 rounded-xl border border-gray-200 p-3 sm:col-span-2 sm:p-4 lg:col-span-4"
+          >
+            <p
+              class="text-[10px] font-semibold uppercase leading-3 tracking-wide text-gray-500 sm:text-[11px] sm:leading-4"
+            >
+              Additional Details
+            </p>
+
+            <p class="mt-2 break-words text-sm leading-6 text-gray-900">
+              {{ address.additionalDetails || 'No additional details' }}
+            </p>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Address Action Dialog -->
+    @if (pendingAddressAction(); as action) {
+      <div
+        class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/40 px-4"
+        role="presentation"
+        (click)="closeAddressActionDialog()"
+      >
+        <div
+          class="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="address-action-title"
+          (click)="$event.stopPropagation()"
+        >
+          <h2 id="address-action-title" class="text-lg font-semibold text-gray-900">
+            @switch (action) {
+              @case ('activate') {
+                Activate address?
+              }
+
+              @case ('deactivate') {
+                Deactivate address?
+              }
+
+              @case ('primary') {
+                Set as primary address?
+              }
+
+              @default {
+                Remove primary status?
+              }
+            }
+          </h2>
+
+          <p class="mt-2 text-sm leading-6 text-gray-600">
+            Confirm this address status change. The actual update can be connected to the API later.
+          </p>
+
+          <div class="mt-6 flex justify-end gap-2">
+            <button
+              type="button"
+              (click)="closeAddressActionDialog()"
+              class="cursor-pointer rounded-lg border border-gray-200 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+            >
+              Cancel
+            </button>
+
+            <button
+              type="button"
+              (click)="closeAddressActionDialog()"
+              class="cursor-pointer rounded-lg bg-gray-900 px-3 py-2 text-sm font-medium text-white hover:bg-gray-800"
+            >
+              Confirm
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+  } @else {
+    <!-- Empty State -->
+    <div class="flex flex-col items-center justify-center px-6 py-12 text-center">
+      <div class="flex h-12 w-12 items-center justify-center rounded-full bg-gray-100">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-6 w-6 text-gray-400"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          stroke-width="2"
+          aria-hidden="true"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M3 10.5L12 3l9 7.5M5.5 9v10.5h13V9M9 19.5v-6h6v6"
+          />
+        </svg>
+      </div>
+
+      <h3 class="mt-3 text-sm font-semibold text-gray-900">No addresses found</h3>
+
+      <p class="mt-1 text-sm text-gray-500">This person does not have any registered addresses.</p>
+    </div>
+  }
+</div>

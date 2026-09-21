@@ -1,8 +1,22 @@
 <div class="flex h-screen overflow-hidden bg-gray-100">
-  <app-sidebar class="h-screen w-64 shrink-0" />
+  @if (mobileSidebarOpen()) {
+    <button
+      type="button"
+      aria-label="Close navigation"
+      class="fixed inset-0 z-30 bg-gray-900/30 lg:hidden"
+      (click)="closeSidebar()"
+    ></button>
+  }
+
+  <app-sidebar
+    (navigationSelected)="closeSidebar()"
+    class="fixed inset-y-0 left-0 z-40 h-screen w-64 -translate-x-full transition-transform lg:static lg:z-auto lg:translate-x-0"
+    [class.translate-x-0]="mobileSidebarOpen()"
+    [class.sidebar-collapsed]="sidebarCollapsed()"
+  />
 
   <div class="flex min-w-0 flex-1 flex-col overflow-hidden">
-    <app-header class="shrink-0" />
+    <app-header (sidebarToggle)="toggleSidebar()" class="shrink-0" />
 
     <main class="flex-1 overflow-y-auto overflow-x-hidden">
       <div class="min-w-0">

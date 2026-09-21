@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, output } from '@angular/core';
 import { AuthStore } from '../../../../core/auth/auth.store';
 
 @Component({
@@ -9,4 +9,5 @@ import { AuthStore } from '../../../../core/auth/auth.store';
 })
 export class HeaderComponent {
   readonly authStore = inject(AuthStore);
+  readonly sidebarToggle = output<void>();
 }

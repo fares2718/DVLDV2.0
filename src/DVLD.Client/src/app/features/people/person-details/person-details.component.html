@@ -1,30 +1,37 @@
 @if (person(); as currentPerson) {
   <div class="min-h-screen bg-gray-100 px-4 py-6 sm:px-6 lg:px-8">
     <div class="mx-auto max-w-6xl space-y-6">
+      <!-- Page Header -->
       <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p class="text-sm font-medium uppercase tracking-[0.2em] text-gray-500">People</p>
+
           <h1 class="mt-1 text-3xl font-bold text-gray-900">Person details</h1>
         </div>
 
         <button
           type="button"
           routerLink="/people"
-          class="rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-sm transition hover:bg-gray-50"
+          class="rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-sm transition hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2"
         >
           Back to list
         </button>
       </div>
 
-      <div class="grid gap-6 lg:grid-cols-[1.3fr_0.7fr]">
-        <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+      <!-- Person Information + Status -->
+      <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_280px]">
+        <!-- Person Information -->
+        <section
+          class="min-w-0 overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm"
+        >
+          <!-- Person Header -->
           <div class="border-b border-gray-200 px-6 py-5">
             <div class="flex items-center gap-4">
               @if (personImageUrl(currentPerson); as imageUrl) {
                 <img
                   [src]="imageUrl"
                   [alt]="currentPerson.fullName"
-                  class="h-14 w-14 rounded-full object-cover ring-2 ring-gray-200"
+                  class="h-14 w-14 shrink-0 rounded-full object-cover ring-2 ring-gray-200"
                   onerror="
                     this.style.display = 'none';
                     this.nextElementSibling.style.display = 'flex';
@@ -32,110 +39,204 @@
                 />
 
                 <div
-                  class="hidden h-14 w-14 items-center justify-center rounded-full bg-gray-900 text-lg font-semibold text-white"
+                  class="hidden h-14 w-14 shrink-0 items-center justify-center rounded-full bg-gray-900 text-lg font-semibold text-white"
                   aria-hidden="true"
                 >
                   {{ personInitial(currentPerson) }}
                 </div>
               } @else {
                 <div
-                  class="flex h-14 w-14 items-center justify-center rounded-full bg-gray-900 text-lg font-semibold text-white"
+                  class="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-gray-900 text-lg font-semibold text-white"
                   aria-hidden="true"
                 >
                   {{ personInitial(currentPerson) }}
                 </div>
               }
 
-              <div>
-                <h2 class="text-2xl font-bold text-gray-900">{{ currentPerson.fullName }}</h2>
-                <p class="mt-1 text-sm text-gray-500">{{ currentPerson.nationalId }}</p>
+              <div class="min-w-0">
+                <h2 class="truncate text-2xl font-bold text-gray-900">
+                  {{ currentPerson.fullName }}
+                </h2>
+
+                <p class="mt-1 text-sm text-gray-500">
+                  {{ currentPerson.nationalId }}
+                </p>
               </div>
             </div>
           </div>
 
-          <div class="grid gap-5 px-6 py-6 md:grid-cols-2">
+          <!-- Person Information -->
+          <div class="grid gap-4 px-6 py-6 sm:grid-cols-2">
+            <!-- Gender -->
             <div class="rounded-xl border border-gray-200 bg-gray-50 p-4">
               <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Gender</p>
-              <p class="mt-2 text-base font-medium text-gray-900">{{ currentPerson.gender }}</p>
+
+              <p class="mt-2 text-sm font-medium text-gray-900">
+                {{ currentPerson.gender }}
+              </p>
             </div>
 
+            <!-- Date of Birth -->
             <div class="rounded-xl border border-gray-200 bg-gray-50 p-4">
               <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">
                 Date of birth
               </p>
-              <p class="mt-2 text-base font-medium text-gray-900">
+
+              <p class="mt-2 text-sm font-medium text-gray-900">
                 {{ currentPerson.dateOfBirth }}
               </p>
             </div>
 
+            <!-- Phone -->
             <div class="rounded-xl border border-gray-200 bg-gray-50 p-4">
               <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Phone</p>
-              <p class="mt-2 text-base font-medium text-gray-900">{{ currentPerson.phone }}</p>
+
+              <p class="mt-2 text-sm font-medium text-gray-900">
+                {{ currentPerson.phone }}
+              </p>
             </div>
 
+            <!-- Alternative Phone -->
             <div class="rounded-xl border border-gray-200 bg-gray-50 p-4">
               <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">
                 Alternative phone
               </p>
-              <p class="mt-2 text-base font-medium text-gray-900">
+
+              <p class="mt-2 break-words text-sm font-medium text-gray-900">
                 {{ currentPerson.altPhone ?? 'Not provided' }}
               </p>
             </div>
 
-            <div class="rounded-xl border border-gray-200 bg-gray-50 p-4 md:col-span-2">
+            <!-- Email -->
+            <div class="rounded-xl border border-gray-200 bg-gray-50 p-4 sm:col-span-2">
               <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Email</p>
-              <p class="mt-2 text-base font-medium text-gray-900">{{ currentPerson.email }}</p>
+
+              <p class="mt-2 break-words text-sm font-medium text-gray-900">
+                {{ currentPerson.email }}
+              </p>
             </div>
 
+            <!-- Mother Name -->
             <div class="rounded-xl border border-gray-200 bg-gray-50 p-4">
               <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Mother name</p>
-              <p class="mt-2 text-base font-medium text-gray-900">{{ currentPerson.motherName }}</p>
+
+              <p class="mt-2 text-sm font-medium text-gray-900">
+                {{ currentPerson.motherName }}
+              </p>
             </div>
 
+            <!-- Nationality -->
             <div class="rounded-xl border border-gray-200 bg-gray-50 p-4">
               <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Nationality</p>
-              <p class="mt-2 text-base font-medium text-gray-900">
+
+              <p class="mt-2 text-sm font-medium text-gray-900">
                 {{ currentPerson.nationality }}
               </p>
             </div>
           </div>
-        </div>
+        </section>
 
-        <aside class="space-y-6">
-          <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-            <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Status</p>
+        <!-- Status -->
+        <aside class="h-fit rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+          <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Status</p>
 
+          <div class="mt-3 flex flex-wrap items-center gap-2">
             @if (currentPerson.isActive) {
               <div
-                class="mt-3 inline-flex items-center rounded-full bg-gray-100 px-3 py-1.5 text-sm font-medium text-gray-700"
+                class="inline-flex items-center rounded-full bg-gray-100 px-3 py-1.5 text-sm font-medium text-gray-700"
               >
                 <span class="mr-2 h-2 w-2 rounded-full bg-gray-500"></span>
+
                 Active
               </div>
+
+              <button
+                type="button"
+                (click)="requestPersonAction('deactivate')"
+                class="cursor-pointer rounded-lg border border-red-200 bg-white px-3 py-1.5 text-xs font-medium text-red-700 transition hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+              >
+                Deactivate
+              </button>
             } @else {
               <div
-                class="mt-3 inline-flex items-center rounded-full bg-gray-900 px-3 py-1.5 text-sm font-medium text-white"
+                class="inline-flex items-center rounded-full bg-gray-900 px-3 py-1.5 text-sm font-medium text-white"
               >
                 <span class="mr-2 h-2 w-2 rounded-full bg-white"></span>
+
                 Inactive
               </div>
-            }
-          </div>
 
-          <div class="rounded-2xl border border-dashed border-gray-300 bg-white p-5 shadow-sm">
-            <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Address</p>
-            <p class="mt-3 text-sm text-gray-500">
-              Address details will be added here in the future.
-            </p>
+              <button
+                type="button"
+                (click)="requestPersonAction('activate')"
+                class="cursor-pointer rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+              >
+                Activate
+              </button>
+            }
           </div>
         </aside>
       </div>
+
+      <!-- Addresses -->
+      <section class="min-w-0">
+        <app-address [addresses]="addresses()" />
+      </section>
+
+      <!-- Person Action Dialog -->
+      @if (pendingPersonAction(); as action) {
+        <div
+          class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/40 px-4"
+          role="presentation"
+          (click)="closePersonActionDialog()"
+        >
+          <div
+            class="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="person-action-title"
+            (click)="$event.stopPropagation()"
+          >
+            <h2 id="person-action-title" class="text-lg font-semibold text-gray-900">
+              {{ action === 'activate' ? 'Activate person?' : 'Deactivate person?' }}
+            </h2>
+
+            <p class="mt-2 text-sm leading-6 text-gray-600">
+              {{
+                action === 'activate'
+                  ? 'This person will be marked as active.'
+                  : 'This person will be marked as inactive.'
+              }}
+            </p>
+
+            <div class="mt-6 flex justify-end gap-2">
+              <button
+                type="button"
+                (click)="closePersonActionDialog()"
+                class="cursor-pointer rounded-lg border border-gray-200 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                (click)="closePersonActionDialog()"
+                class="cursor-pointer rounded-lg bg-gray-900 px-3 py-2 text-sm font-medium text-white hover:bg-gray-800"
+              >
+                Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      }
     </div>
   </div>
 } @else {
+  <!-- Person Not Found -->
   <div class="flex min-h-screen items-center justify-center bg-gray-100 px-4">
     <div class="rounded-2xl border border-gray-200 bg-white p-6 text-center shadow-sm">
       <h2 class="text-xl font-semibold text-gray-900">Person not found</h2>
+
       <p class="mt-2 text-sm text-gray-500">No person details were provided for this record.</p>
     </div>
   </div>

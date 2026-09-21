@@ -1,0 +1,6 @@
+@media (min-width: 1024px) {
+  app-sidebar.sidebar-collapsed {
+    width: 0;
+    overflow: hidden;
+  }
+}
