@@ -17,10 +17,18 @@ export class PeopleService {
   private readonly _peopleSummary = signal<PagedList<PersonSummary> | null>(null);
   readonly peopleSummary = this._peopleSummary.asReadonly();
 
+  count: number = 0;
+
   createPerson(person: CreatePerson) {
     return this.http.post(`${this.apiUrl}/create-person`, person, {
       withCredentials: true,
     });
+  }
+
+  getPeopleCount(): Observable<number> {
+    return this.http
+      .get<number>(`${this.apiUrl}/get-people-count`, { withCredentials: true })
+      .pipe(tap((count) => (this.count = count)));
   }
 
   getPeopleSummary(filters: PeopleFilter): Observable<PagedList<PersonSummary>> {

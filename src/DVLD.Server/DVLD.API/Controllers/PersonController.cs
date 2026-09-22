@@ -68,6 +68,19 @@ namespace DVLD.API.Controllers
             return Ok("Person has been deactivated successfully");
         }
 
+        [HttpGet("get-people-count")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetPeopleCount(CancellationToken cancellationToken)
+        {
+            var query = new GetPeopleCountQuery();
+            var result = await Sender.Send(query, cancellationToken);
+            if (result.IsError)
+                return HandleErrors(result.Errors);
+            return Ok(result.Value);
+        }
+
         [HttpGet("get-person/{personId:guid}", Name = "get-person")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

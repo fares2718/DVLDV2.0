@@ -142,6 +142,11 @@ internal class PersonRepository(DvldContext dvldContext) : IPersonRepository
                query.PageSize);
     }
 
+    public async Task<int> GetPeopleCount(CancellationToken cancellationToken = default)
+    {
+        return await _dvldContext.People.AsNoTracking().CountAsync(cancellationToken);
+    }
+
     private async Task<Person?> GetPersonById(Guid personId, CancellationToken cancellationToken)
     {
         var person = await _dvldContext.People.FindAsync(personId, cancellationToken);

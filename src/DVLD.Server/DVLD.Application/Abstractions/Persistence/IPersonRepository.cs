@@ -12,6 +12,8 @@ public interface IPersonRepository
     Task DeActivateAsync(Guid personId, CancellationToken cancellationToken);
     Task<PagedList<PersonSummary>> GetPeopleSummaryAsync( GetPeopleQuery query,
         CancellationToken cancellationToken);
+
+    Task<int> GetPeopleCount(CancellationToken cancellationToken = default);
     Task<PersonSummary?> GetSummaryByIdAsync(Guid personId, CancellationToken cancellationToken);
     Task<bool> IsNationalIdUnique(string nationalId);
     Task<bool> IsEmailUnique(string email);
