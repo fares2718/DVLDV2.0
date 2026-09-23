@@ -144,8 +144,6 @@ export class PeopleSummaryComponent implements OnInit {
   }
 
   viewPerson(person: PersonSummary): void {
-    this._router.navigate([`/people/${person.personId}`], {
-      state: { person },
-    });
+    this._router.navigate([`/people/${person.personId}`]);
   }
 }

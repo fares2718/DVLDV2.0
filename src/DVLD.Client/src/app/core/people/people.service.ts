@@ -61,4 +61,24 @@ export class PeopleService {
       })
       .pipe(tap((peopleSummary) => this._peopleSummary.set(peopleSummary)));
   }
+
+  getPersonById(personId: string): Observable<PersonSummary> {
+    return this.http.get<PersonSummary>(`${this.apiUrl}/get-person/${personId}`, {
+      withCredentials: true,
+    });
+  }
+
+  activatePerson(personId: string): Observable<void> {
+    return this.http.patch<void>(`${this.apiUrl}/activate-person/${personId}`, null, {
+      withCredentials: true,
+      responseType: 'text',
+    });
+  }
+
+  deactivatePerson(personId: string): Observable<void> {
+    return this.http.patch<void>(`${this.apiUrl}/deactivate-person/${personId}`, null, {
+      withCredentials: true,
+      responseType: 'text',
+    });
+  }
 }
