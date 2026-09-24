@@ -178,6 +178,54 @@
               }
             }
           </div>
+          <div class="h-fit rounded-2xl border border-gray-200 bg-white p-5 shadow-sm mt-15 mb-20">
+            <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Quick actions</p>
+
+            <div class="mt-4 space-y-2">
+              @if (authStore.hasPermission(permission.EditPeople)) {
+                <button
+                  type="button"
+                  [routerLink]="['/people', currentPerson.personId, 'edit']"
+                  class="flex w-full items-center justify-between rounded-xl border border-gray-200 px-4 py-3 text-left text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+                >
+                  <span>Edit person</span>
+
+                  <span class="text-gray-400">→</span>
+                </button>
+
+                <button
+                  type="button"
+                  class="flex w-full items-center justify-between rounded-xl border border-gray-200 px-4 py-3 text-left text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+                >
+                  <span>Add address</span>
+
+                  <span class="text-gray-400">→</span>
+                </button>
+              }
+
+              @if (authStore.hasPermission(permission.ViewLicenses)) {
+                <button
+                  type="button"
+                  class="flex w-full items-center justify-between rounded-xl border border-gray-200 px-4 py-3 text-left text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+                >
+                  <span>View licenses</span>
+
+                  <span class="text-gray-400">→</span>
+                </button>
+              }
+
+              @if (authStore.hasPermission(permission.ViewApplications)) {
+                <button
+                  type="button"
+                  class="flex w-full items-center justify-between rounded-xl border border-gray-200 px-4 py-3 text-left text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+                >
+                  <span>Applications</span>
+
+                  <span class="text-gray-400">→</span>
+                </button>
+              }
+            </div>
+          </div>
         </aside>
       </div>
 

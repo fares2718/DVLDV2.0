@@ -25,6 +25,55 @@ export class PeopleService {
     });
   }
 
+  updatePersonName(
+    personId: string,
+    name: {
+      firstName: string;
+      secondName: string;
+      thirdName: string;
+      lastName: string;
+      motherName: string;
+    },
+  ): Observable<void> {
+    return this.http.patch<void>(`${this.apiUrl}/update-person-name/${personId}`, name, {
+      withCredentials: true,
+    });
+  }
+
+  updatePersonContactInfo(
+    personId: string,
+    contactInfo: { phone: string; altPhone: string },
+  ): Observable<void> {
+    return this.http.patch<void>(
+      `${this.apiUrl}/update-person-contact-info/${personId}`,
+      contactInfo,
+      {
+        withCredentials: true,
+      },
+    );
+  }
+
+  updatePersonalInfo(
+    personId: string,
+    personalInfo: { dateOfBirth: string; nationalityCountryCode: string },
+  ): Observable<void> {
+    return this.http.patch<void>(`${this.apiUrl}/update-personal-info/${personId}`, personalInfo, {
+      withCredentials: true,
+    });
+  }
+
+  uploadPersonImage(personId: string, image: File, personName: string): Observable<void> {
+    const extension = image.name.includes('.') ? image.name.slice(image.name.lastIndexOf('.')) : '';
+    const fileName = `${personName.trim().replace(/[^a-zA-Z0-9]+/g, '_')}${extension}`;
+    const formData = new FormData();
+    formData.append('FileName', fileName);
+    formData.append('image', image, fileName);
+
+    return this.http.patch<void>(`${this.apiUrl}/upload-image/${personId}`, formData, {
+      withCredentials: true,
+    });
+  }
+
   getPeopleCount(): Observable<number> {
     return this.http
       .get<number>(`${this.apiUrl}/get-people-count`, { withCredentials: true })

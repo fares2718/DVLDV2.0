@@ -1,0 +1,215 @@
+<div class="min-h-screen bg-gray-100 px-4 py-6 sm:px-6 lg:px-8">
+  <div class="mx-auto max-w-5xl space-y-6">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div>
+        <p class="text-sm font-medium uppercase tracking-[0.2em] text-gray-500">People</p>
+        <h1 class="mt-1 text-3xl font-bold text-gray-900">Edit person</h1>
+      </div>
+      <button
+        type="button"
+        [routerLink]="['/people', personId]"
+        class="rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
+      >
+        Back to details
+      </button>
+    </div>
+
+    @if (message) {
+      <div
+        class="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800"
+        role="status"
+      >
+        {{ message }}
+      </div>
+    }
+    @if (errorMessage) {
+      <div
+        class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800"
+        role="alert"
+      >
+        {{ errorMessage }}
+      </div>
+    }
+
+    <section class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+      <div class="border-b border-gray-200 px-6 py-5">
+        <h2 class="text-lg font-semibold text-gray-900">Profile image</h2>
+      </div>
+      <div class="flex flex-col items-center gap-5 px-6 py-8 sm:flex-row sm:items-center">
+        <div class="relative shrink-0">
+          @if (imagePreviewUrl || currentImageUrl) {
+            <img
+              [src]="imagePreviewUrl || currentImageUrl"
+              alt="Profile preview"
+              class="h-32 w-32 rounded-full object-cover ring-4 ring-gray-100"
+            />
+          } @else {
+            <div
+              class="flex h-32 w-32 items-center justify-center rounded-full bg-gray-900 text-4xl font-semibold text-white ring-4 ring-gray-100"
+            >
+              ?
+            </div>
+          }
+          <label
+            for="personImage"
+            title="Change profile image"
+            aria-label="Change profile image"
+            class="absolute bottom-0 right-0 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border-4 border-white bg-gray-900 text-lg text-white shadow-md transition hover:bg-gray-700"
+          >
+            ✎
+          </label>
+          <input
+            id="personImage"
+            type="file"
+            accept="image/*"
+            (change)="chooseImage($event)"
+            class="sr-only"
+          />
+        </div>
+
+        <div class="min-w-0 flex-1 text-center sm:text-left">
+          <p class="text-sm font-medium text-gray-900">Profile photo</p>
+          <p class="mt-1 text-sm text-gray-500">Choose a clear photo from your computer.</p>
+          @if (selectedImage) {
+            <p class="mt-2 truncate text-sm text-gray-500">Selected: {{ selectedImage.name }}</p>
+          }
+        </div>
+        <button
+          type="button"
+          (click)="uploadImage()"
+          [disabled]="!selectedImage"
+          class="rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:bg-gray-300"
+        >
+          Upload image
+        </button>
+      </div>
+    </section>
+
+    <section class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+      <div class="border-b border-gray-200 px-6 py-5">
+        <h2 class="text-lg font-semibold text-gray-900">Person name</h2>
+      </div>
+      <form
+        [formGroup]="nameForm"
+        (ngSubmit)="submitName()"
+        class="grid gap-5 px-6 py-6 sm:grid-cols-2"
+      >
+        @for (
+          field of [
+            { id: 'firstName', label: 'First name' },
+            { id: 'secondName', label: 'Second name' },
+            { id: 'thirdName', label: 'Third name' },
+            { id: 'lastName', label: 'Last name' },
+            { id: 'motherName', label: 'Mother name' },
+          ];
+          track field.id
+        ) {
+          <div>
+            <label [for]="field.id" class="mb-1.5 block text-sm font-medium text-gray-700">{{
+              field.label
+            }}</label>
+            <input
+              [id]="field.id"
+              [formControlName]="field.id"
+              type="text"
+              class="block w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm text-gray-900 outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900"
+            />
+          </div>
+        }
+        <div class="sm:col-span-2 flex justify-end border-t border-gray-100 pt-4">
+          <button
+            type="submit"
+            [disabled]="nameForm.invalid"
+            class="rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:bg-gray-300"
+          >
+            Save name
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <section class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+      <div class="border-b border-gray-200 px-6 py-5">
+        <h2 class="text-lg font-semibold text-gray-900">Contact information</h2>
+      </div>
+      <form
+        [formGroup]="contactForm"
+        (ngSubmit)="submitContact()"
+        class="grid gap-5 px-6 py-6 sm:grid-cols-2"
+      >
+        <div>
+          <label for="phone" class="mb-1.5 block text-sm font-medium text-gray-700">Phone</label>
+          <input
+            id="phone"
+            formControlName="phone"
+            type="tel"
+            class="block w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm text-gray-900 outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900"
+          />
+        </div>
+        <div>
+          <label for="altPhone" class="mb-1.5 block text-sm font-medium text-gray-700"
+            >Alternative phone</label
+          >
+          <input
+            id="altPhone"
+            formControlName="altPhone"
+            type="tel"
+            class="block w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm text-gray-900 outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900"
+          />
+        </div>
+        <div class="sm:col-span-2 flex justify-end border-t border-gray-100 pt-4">
+          <button
+            type="submit"
+            [disabled]="contactForm.invalid"
+            class="rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:bg-gray-300"
+          >
+            Save contact information
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <section class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+      <div class="border-b border-gray-200 px-6 py-5">
+        <h2 class="text-lg font-semibold text-gray-900">Personal information</h2>
+      </div>
+      <form
+        [formGroup]="personalForm"
+        (ngSubmit)="submitPersonal()"
+        class="grid gap-5 px-6 py-6 sm:grid-cols-2"
+      >
+        <div>
+          <label for="dateOfBirth" class="mb-1.5 block text-sm font-medium text-gray-700"
+            >Date of birth</label
+          >
+          <input
+            id="dateOfBirth"
+            formControlName="dateOfBirth"
+            type="date"
+            class="block w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm text-gray-900 outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900"
+          />
+        </div>
+        <div>
+          <label for="nationalityCountryCode" class="mb-1.5 block text-sm font-medium text-gray-700"
+            >Nationality country code</label
+          >
+          <input
+            id="nationalityCountryCode"
+            formControlName="nationalityCountryCode"
+            type="text"
+            class="block w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm text-gray-900 outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900"
+          />
+        </div>
+        <div class="sm:col-span-2 flex justify-end border-t border-gray-100 pt-4">
+          <button
+            type="submit"
+            [disabled]="personalForm.invalid"
+            class="rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:bg-gray-300"
+          >
+            Save personal information
+          </button>
+        </div>
+      </form>
+    </section>
+  </div>
+</div>
